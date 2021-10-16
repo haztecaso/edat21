@@ -1,6 +1,6 @@
 #include <string>
 #include <sstream>
-#include "pila_int.hpp"
+#include "pila_int_static.hpp"
 
 using namespace std;
 
