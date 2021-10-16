@@ -26,7 +26,7 @@ $(ODIR)/%.o: $(TADS)/%.cpp $(TADS)/%.hpp
 	$(CC) -c $(INC) -o $@ $< $(CFLAGS)
 
 # Make directories
-mkdirs:
+dirs:
 	mkdir -p $(OUT) $(OBJS)
 
 # Clean bins and objs
