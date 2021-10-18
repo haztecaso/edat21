@@ -26,3 +26,9 @@ ejemplo mediante el comando `make dirs` o `mkdir -p bin`.
 Para compilar los tests podemos ejecutar el comando `make tests`. Esto creará el
 binario `bin/test_pila` que podemos ejecutar directamente desde la línea de
 comandos: `./bin/test_pila`.
+
+### Manualmente
+
+```
+gcc -o bin/test_pila tests/test_pila.cpp
+```
