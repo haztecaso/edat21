@@ -175,17 +175,18 @@ int main(int argc, char ** argv) {
         ifstream file;
         file.open(argv[1]);
         if (!file.is_open()) return 1;
-        Mem mem = *(new Mem);
+        Mem *mem = new Mem;
         cout << setprecision(PRECISION);
         try
         {
-            while(ejecutar(mem, file));
+            while(ejecutar(*mem, file));
             cout << endl;
         }
         catch(string err)
         {
             cout << endl << "Error: " << err << endl;
         }
+        delete mem;
         return 0;
     }
     else return 1;
