@@ -20,6 +20,7 @@ template <class T> void avanzar(Cola<T> &cola);
 template <class T> T primero(Cola<T> cola);
 template <class T> int tamano(Cola<T> cola);
 template <class T> std::ostream& operator<<(std::ostream& os, Cola<T> cola);
+template <class T> std::ostream& operator<<(std::ostream& os, Cola<T> *cola);
 
 struct ColaVaciaUndef : public exception
 {
@@ -92,5 +93,11 @@ template <class T> std::ostream& operator<<(std::ostream& os, Cola<T> cola)
         nodo_actual = nodo_actual->siguiente;
     }
     os << "]";
+    return os;
+}
+
+template <class T> std::ostream& operator<<(std::ostream& os, Cola<T> *cola)
+{
+    os << *cola;
     return os;
 }

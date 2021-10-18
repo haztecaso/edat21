@@ -16,12 +16,11 @@ struct Pila {
 template <class T> bool es_vacia(Pila<T> pila);
 template <class T> void apilar(Pila<T> &pila, T valor);
 template <class T> void desapilar(Pila<T> &pila);
-template <class T> void desapilar_con_cuidado(Pila<T> &pila);
 template <class T> T cima(Pila<T> pila);
 template <class T> int tamano(Pila<T> pila);
 template <class T> T cima_y_desapilar(Pila<T> &pila);
-template <class T> T cima_y_desapilar_con_cuidado(Pila<T> &pila);
-template <class T> std::ostream& operator<<(std::ostream& os, Pila<T> obj);
+template <class T> std::ostream& operator<<(std::ostream& os, Pila<T> pila);
+template <class T> std::ostream& operator<<(std::ostream& os, Pila<T> *pila);
 
 // Implementaciones
 
@@ -68,25 +67,6 @@ template <class T> void desapilar(Pila<T> &pila)
         throw PilaVaciaUndef();
 }
 
-template <class T> void desapilar_con_cuidado(Pila<T> &pila)
-{
-    if(!es_vacia(pila))
-    {
-        Nodo_Simple<T> *nodo_actual = pila.nodo;
-        while(nodo_actual->siguiente->siguiente != nullptr)
-        {
-            nodo_actual->valor = nodo_actual->siguiente->valor;
-            nodo_actual = nodo_actual->siguiente;
-        }
-        nodo_actual->valor = nodo_actual->siguiente->valor;
-        delete nodo_actual->siguiente;
-        nodo_actual->siguiente=nullptr;
-        pila.tamano--;
-    }
-    else
-        throw PilaVaciaUndef();
-}
-
 template <class T> T cima(Pila<T> pila)
 {
     if(!es_vacia(pila))
@@ -107,13 +87,6 @@ template <class T> T cima_y_desapilar(Pila<T> &pila)
     return result;
 }
 
-template <class T> T cima_y_desapilar_con_cuidado(Pila<T> &pila)
-{
-    T result = cima(pila);
-    desapilar_con_cuidado(pila);
-    return result;
-}
-
 template <class T> std::ostream& operator<<(std::ostream& os, Pila<T> pila)
 {
     Nodo_Simple<T> *nodo_actual = pila.nodo;
@@ -124,5 +97,11 @@ template <class T> std::ostream& operator<<(std::ostream& os, Pila<T> pila)
             os << " ";
             nodo_actual = nodo_actual->siguiente;
     }
+    return os;
+}
+
+template <class T> std::ostream& operator<<(std::ostream& os, Pila<T> *pila)
+{
+    os << *pila;
     return os;
 }
