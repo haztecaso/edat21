@@ -120,8 +120,10 @@ template <class T> std::ostream& operator<<(std::ostream& os, Pila<T> pila)
     Nodo_Pila<T> *nodo_actual = pila.nodo;
     while (nodo_actual != nullptr)
     {
-        os << nodo_actual->valor << " ";
-        nodo_actual = nodo_actual->siguiente;
+        os << nodo_actual->valor;
+        if(nodo_actual->siguiente != nullptr)
+            os << " ";
+            nodo_actual = nodo_actual->siguiente;
     }
     return os;
 }
