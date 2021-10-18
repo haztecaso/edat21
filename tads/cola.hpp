@@ -2,18 +2,15 @@
 #include <sstream>
 #include <exception>
 
+#pragma once
+#include "./basicos.hpp"
+
 using namespace std;
 
 template<class T>
-struct Nodo_Cola {
-    T valor;
-    Nodo_Cola<T> * siguiente = nullptr;
-};
-
-template<class T>
 struct Cola {
-    Nodo_Cola<T> *primero = nullptr;
-    Nodo_Cola<T> *ultimo  = nullptr;
+    Nodo_Simple<T> *primero = nullptr;
+    Nodo_Simple<T> *ultimo  = nullptr;
     int tamano = 0;
 };
 
@@ -32,6 +29,8 @@ struct ColaVaciaUndef : public exception
     }
 };
 
+// Implementaciones
+
 template <class T> bool es_vacia(Cola<T> cola)
 {
     return cola.tamano == 0;
@@ -42,12 +41,12 @@ template <class T> void pedir_vez(Cola<T> &cola, T valor)
     if (es_vacia(cola))
     {
         cola = *(new Cola<T>);
-        cola.primero = new Nodo_Cola<T>;
+        cola.primero = new Nodo_Simple<T>;
         cola.ultimo = cola.primero;
     }
     else
     {
-        Nodo_Cola<T> *nodo_nuevo = new Nodo_Cola<T>;
+        Nodo_Simple<T> *nodo_nuevo = new Nodo_Simple<T>;
         cola.ultimo->siguiente = nodo_nuevo;
         cola.ultimo = nodo_nuevo;
     }
@@ -59,7 +58,7 @@ template <class T> void avanzar(Cola<T> &cola)
 {
     if(!es_vacia(cola))
     {
-        Nodo_Cola<T> *nodo_antiguo = cola.primero;
+        Nodo_Simple<T> *nodo_antiguo = cola.primero;
         cola.primero = cola.primero->siguiente;
         delete nodo_antiguo;
         cola.tamano--;
@@ -84,7 +83,7 @@ template <class T> int tamano(Cola<T> cola)
 template <class T> std::ostream& operator<<(std::ostream& os, Cola<T> cola)
 {
     os << "[";
-    Nodo_Cola<T> *nodo_actual = cola.primero;
+    Nodo_Simple<T> *nodo_actual = cola.primero;
     while (nodo_actual != nullptr)
     {
         os << nodo_actual->valor;

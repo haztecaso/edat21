@@ -2,17 +2,14 @@
 #include <sstream>
 #include <exception>
 
+#pragma once
+#include "./basicos.hpp"
+
 using namespace std;
 
 template<class T>
-struct Nodo_Pila {
-    T valor;
-    Nodo_Pila<T> * siguiente = nullptr;
-};
-
-template<class T>
 struct Pila {
-    Nodo_Pila<T> *nodo = nullptr;
+    Nodo_Simple<T> *nodo = nullptr;
     int tamano = 0;
 };
 
@@ -25,6 +22,8 @@ template <class T> int tamano(Pila<T> pila);
 template <class T> T cima_y_desapilar(Pila<T> &pila);
 template <class T> T cima_y_desapilar_con_cuidado(Pila<T> &pila);
 template <class T> std::ostream& operator<<(std::ostream& os, Pila<T> obj);
+
+// Implementaciones
 
 struct PilaVaciaUndef : public exception
 {
@@ -44,11 +43,11 @@ template <class T> void apilar(Pila<T> &pila, T valor)
     if (es_vacia(pila))
     {
         pila = *(new Pila<T>);
-        pila.nodo = new Nodo_Pila<T>;
+        pila.nodo = new Nodo_Simple<T>;
     }
     else
     {
-        Nodo_Pila<T> *nodo_nuevo = new Nodo_Pila<T>;
+        Nodo_Simple<T> *nodo_nuevo = new Nodo_Simple<T>;
         nodo_nuevo->siguiente = pila.nodo;
         pila.nodo = nodo_nuevo;
     }
@@ -60,7 +59,7 @@ template <class T> void desapilar(Pila<T> &pila)
 {
     if(!es_vacia(pila))
     {
-        Nodo_Pila<T> *nodo_antiguo = pila.nodo;
+        Nodo_Simple<T> *nodo_antiguo = pila.nodo;
         pila.nodo = pila.nodo->siguiente;
         delete nodo_antiguo;
         pila.tamano--;
@@ -73,7 +72,7 @@ template <class T> void desapilar_con_cuidado(Pila<T> &pila)
 {
     if(!es_vacia(pila))
     {
-        Nodo_Pila<T> *nodo_actual = pila.nodo;
+        Nodo_Simple<T> *nodo_actual = pila.nodo;
         while(nodo_actual->siguiente->siguiente != nullptr)
         {
             nodo_actual->valor = nodo_actual->siguiente->valor;
@@ -117,7 +116,7 @@ template <class T> T cima_y_desapilar_con_cuidado(Pila<T> &pila)
 
 template <class T> std::ostream& operator<<(std::ostream& os, Pila<T> pila)
 {
-    Nodo_Pila<T> *nodo_actual = pila.nodo;
+    Nodo_Simple<T> *nodo_actual = pila.nodo;
     while (nodo_actual != nullptr)
     {
         os << nodo_actual->valor;

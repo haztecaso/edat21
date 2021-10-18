@@ -6,7 +6,7 @@ TESTS = tests
 _TESTS = test_pila test_pila_int test_pila_int_static test_cola
 tests: $(patsubst %,$(OUT)/%,$(_TESTS))
 
-$(OUT)/test_%: $(TESTS)/test_%.cpp $(TADS)/%.hpp 
+$(OUT)/test_%: $(TESTS)/test_%.cpp $(TADS)/%.hpp  $(TADS)/basicos.hpp
 	$(CC) -o $@ $<
 
 # Make directories
