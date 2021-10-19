@@ -1,6 +1,5 @@
-# Calculadora - sc (stackcalculator)
+# Calculadora
 
-- Operaciones: 
 - Reverse polish notation
 
 ## Compilar
@@ -12,5 +11,5 @@ make
 ## Ejecutar
 
 ```
-./sc example.txt
+./calculadora example.txt
 ```

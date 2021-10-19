@@ -3,11 +3,11 @@ OUT = bin
 TADS = tads
 TESTS = tests
 
-build: tests sc
+build: tests calculadora
 
-sc: $(OUT)/sc
-$(OUT)/sc: sc/sc.cpp
-	$(MAKE) -C sc
+calculadora: $(OUT)/calculadora
+$(OUT)/calculadora: calculadora/calculadora.cpp
+	$(MAKE) -C calculadora
 
 _TESTS = test_pila test_pila_int test_pila_int_static\
 		 test_cola
