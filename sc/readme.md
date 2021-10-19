@@ -12,5 +12,5 @@ make
 ## Ejecutar
 
 ```
-./sc
+./sc example.txt
 ```
