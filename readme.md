@@ -1,4 +1,4 @@
-# Estructuras de datos (21/22)
+# Estructuras de datos 2021
 
 ![make](https://github.com/haztecaso/edat21/actions/workflows/make.yml/badge.svg)
 
