@@ -1,5 +1,7 @@
 # Estructuras de datos (21/22)
 
+![make](https://github.com/haztecaso/edat21/actions/workflows/make.yml/badge.svg)
+
 Repositorio con ejercicios y entregas de la asignatura **Estructuras de datos** del
 curso 2021/2022.
 
