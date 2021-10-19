@@ -90,6 +90,7 @@ template <class T> T cima_y_desapilar(Pila<T> &pila)
 template <class T> std::ostream& operator<<(std::ostream& os, Pila<T> pila)
 {
     Nodo_Simple<T> *nodo_actual = pila.nodo;
+    os << "[";
     while (nodo_actual != nullptr)
     {
         os << nodo_actual->valor;
@@ -97,6 +98,7 @@ template <class T> std::ostream& operator<<(std::ostream& os, Pila<T> pila)
             os << " ";
             nodo_actual = nodo_actual->siguiente;
     }
+    os << "]";
     return os;
 }
 
