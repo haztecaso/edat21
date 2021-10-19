@@ -96,7 +96,7 @@ void casos_lit(Lit lit, Mem &mem, Reg r)
             cout << r[0] << " ";
             break;
         case op_printall:
-            cout << "[" << mem << "] ";
+            cout << mem;
             break;
         case op_dumpprint:
             r[0] = cima_y_desapilar(mem);
