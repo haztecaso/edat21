@@ -1,5 +1,5 @@
 #include <iostream>
-#include "../tads/cola.hpp"
+#include "cola.hpp"
 
 using namespace std;
 

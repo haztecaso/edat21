@@ -1,6 +1,6 @@
 #include <iostream>
 #include <string>
-#include "../tads/pila.hpp"
+#include "pila.hpp"
 
 using namespace std;
 

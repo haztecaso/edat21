@@ -1,5 +1,5 @@
 #include <iostream>
-#include "../tads/pila_int.hpp"
+#include "pila_int.hpp"
 
 using namespace std;
 

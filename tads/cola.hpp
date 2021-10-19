@@ -2,8 +2,9 @@
 #include <sstream>
 #include <exception>
 
-#pragma once
 #include "./basicos.hpp"
+
+#pragma once
 
 using namespace std;
 

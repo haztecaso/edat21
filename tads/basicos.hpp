@@ -2,6 +2,8 @@
 #include <sstream>
 #include <exception>
 
+#pragma once
+
 using namespace std;
 
 

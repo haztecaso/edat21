@@ -7,13 +7,13 @@ _TESTS = test_pila test_pila_int test_pila_int_static test_cola
 tests: $(patsubst %,$(OUT)/%,$(_TESTS))
 
 $(OUT)/test_%: $(TESTS)/test_%.cpp $(TADS)/%.hpp  $(TADS)/basicos.hpp
-	$(CC) -o $@ $<
+	$(CC) $< -o $@ -I$(TADS)
 
 # Make directories
 mkdirs:
-	mkdir -p $(OUT) $(OBJS)
+	mkdir -p $(OUT)
 
 # Clean bins and objs
 .PHONY: clean
 clean:
-	rm -r $(ODIR)/*.o $(OUT)/*
+	rm -r $(OUT)/*
