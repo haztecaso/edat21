@@ -1,44 +1,35 @@
 #include <iostream>
+#include <string>
 #include "../tads/pila.hpp"
 
 using namespace std;
 
+typedef string El;
+typedef Pila<Pila<El> *> SuperPila;
+
 int main(){
-    Pila<char> *p1 = new Pila<char>;
-    apilar(*p1,'a');
-    apilar(*p1,'b');
-    apilar(*p1,'c');
+    SuperPila *sp = new SuperPila;
+    Pila<El> *p1 = new Pila<El>;
+    Pila<El> *p2 = new Pila<El>;
 
-    Pila<char> *p2 = new Pila<char>;
-    apilar(*p2,'A');
-    apilar(*p2,'B');
-    apilar(*p2,'C');
+    apilar(*sp, p1);
+    apilar(*sp, p2);
 
-    Pila<char> *p3 = new Pila<char>;
-    apilar(*p3,'1');
-    apilar(*p3,'2');
-    apilar(*p3,'3');
+    apilar(*p1, string("A"));
+    apilar(*p2, string("B"));
 
+    cout << sp << endl;
 
-    Pila<Pila<char> *> *pila_de_pilas = new Pila<Pila<char> *>;
-    apilar(*pila_de_pilas, p1);
-    apilar(*pila_de_pilas, p2);
-    apilar(*pila_de_pilas, p3);
+    apilar(*p1, string("B"));
+    apilar(*p2, string("A"));
+    apilar(*p1, string("C"));
+    apilar(*p2, string("C"));
+    apilar(*sp, p1);
+    apilar(*sp, p1);
+    apilar(*sp, p2);
+    apilar(*sp, p2);
 
-    cout << *pila_de_pilas << endl;
-    cout << "tamano(p1) = " << tamano(*p1) << "; ";
-    cout << "tamano(p2) = " << tamano(*p2) << "; ";
-    cout << "tamano(p3) = " << tamano(*p3) << "; ";
-    cout << endl;
-
-    desapilar(*p1);
-    desapilar(*p2);
-    desapilar(*p3);
-
-    cout << *pila_de_pilas << endl;
-    cout << "tamano(p1) = " << tamano(*p1) << "; ";
-    cout << "tamano(p2) = " << tamano(*p2) << "; ";
-    cout << "tamano(p3) = " << tamano(*p3) << "; ";
+    cout << sp << endl;
 
     return 0;
 }
