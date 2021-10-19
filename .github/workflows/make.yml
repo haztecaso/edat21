@@ -21,7 +21,7 @@ jobs:
         path: bin
         key: ${{ runner.os }}-bins
     - name: prepare env
-      run: mkdir bin
+      run: mkdir -p bin
     - name: build
       run: make build
     - name: test
