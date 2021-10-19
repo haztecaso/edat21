@@ -1,8 +1,9 @@
 CC = g++
 OUT = ../bin
+TADS = ../tads
 
-$(OUT)/sc: sc.cpp
-	$(CC) -o $@ $<
+$(OUT)/sc: sc.cpp $(TADS)/pila.hpp
+	$(CC) $< -o $@ -I $(TADS)
 
 .PHONY: clean
 

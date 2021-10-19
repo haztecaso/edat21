@@ -4,7 +4,7 @@
 #include <functional>
 #include <cmath>
 
-#include "../tads/pila.hpp"
+#include "pila.hpp"
 
 #define PRECISION 12
 #define NUMERO_REGISTROS 2
