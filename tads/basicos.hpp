@@ -19,4 +19,3 @@ struct Nodo_Doble {
     Nodo_Simple<T> * siguiente = nullptr;
     Nodo_Simple<T> * anterior = nullptr;
 };
-error;
