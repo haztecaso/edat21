@@ -9,7 +9,7 @@ calculadora: $(OUT)/calculadora
 $(OUT)/calculadora: calculadora/calculadora.cpp
 	$(MAKE) -C calculadora
 
-_TESTS = test_pila test_pila_int test_pila_int_static\
+_TESTS = test_pila test_pila_static test_pila_int test_pila_int_static\
 		 test_cola
 tests: $(patsubst %,$(OUT)/%,$(_TESTS))
 $(OUT)/test_%: $(TESTS)/test_%.cpp $(TADS)/%.hpp  $(TADS)/basicos.hpp
