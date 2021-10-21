@@ -11,9 +11,9 @@
 
 using namespace std;
 
-typedef long double El;
-typedef Pila<El> Mem;
-typedef El *Reg;
+typedef long double el;
+typedef pila<el> mem;
+typedef el *reg;
 
 
 enum Lit {
@@ -44,23 +44,23 @@ const string ops_1[] = {
 };
 
 Lit parse_op(string lit);
-void casos_lit(Lit lit, Mem &mem, Reg r);
-bool ejecutar(Mem &mem, ifstream &file);
-void ejecutar_op(El (*fn)(El), Mem &mem, Reg r);
-void ejecutar_op(El (*fn)(El, El), Mem &mem, Reg r);
+void casos_lit(Lit lit, mem &m, reg r);
+bool ejecutar(mem &m, ifstream &file);
+void ejecutar_op(el (*fn)(el), mem &m, reg r);
+void ejecutar_op(el (*fn)(el, el), mem &m, reg r);
 
 
-void ejecutar_op(El (*fn)(El), Mem &mem, Reg r)
+void ejecutar_op(el (*fn)(el), mem &m, reg r)
 {
-    r[0] = cima_y_desapilar(mem);
-    apilar(mem, fn(r[0]));
+    r[0] = cima_y_desapilar(m);
+    apilar(m, fn(r[0]));
 }
 
-void ejecutar_op(El (*fn)(El, El), Mem &mem, Reg r)
+void ejecutar_op(el (*fn)(el, el), mem &m, reg r)
 {
-    r[1] = cima_y_desapilar(mem);
-    r[0] = cima_y_desapilar(mem);
-    apilar(mem, fn(r[0], r[1]));
+    r[1] = cima_y_desapilar(m);
+    r[0] = cima_y_desapilar(m);
+    apilar(m, fn(r[0], r[1]));
 }
 
 
@@ -84,78 +84,78 @@ Lit parse_lit(string lit)
     throw "`"+ lit + "` literal unknown";
 }
 
-void casos_lit(Lit lit, Mem &mem, Reg r)
+void casos_lit(Lit lit, mem &m, reg r)
 {
     switch(lit)
     {
         case op_dump:
-            desapilar(mem);
+            desapilar(m);
             break;
         case op_print:
-            r[0] = cima(mem);
+            r[0] = cima(m);
             cout << r[0] << " ";
             break;
         case op_printall:
-            cout << mem;
+            cout << m;
             break;
         case op_dumpprint:
-            r[0] = cima_y_desapilar(mem);
+            r[0] = cima_y_desapilar(m);
             cout << r[0] << " ";
             break;
         case op_dup:
-            r[0] = cima(mem);
-            apilar(mem, r[0]);
+            r[0] = cima(m);
+            apilar(m, r[0]);
             break;
         case op_suma:
-            ejecutar_op([](El a, El b) { return a + b; }, mem, r);
+            ejecutar_op([](el a, el b) { return a + b; }, m, r);
             break;
         case op_resta:
-            ejecutar_op([](El a, El b) { return a - b; }, mem, r);
+            ejecutar_op([](el a, el b) { return a - b; }, m, r);
             break;
         case op_mult:
-            ejecutar_op([](El a, El b) { return a * b; }, mem, r);
+            ejecutar_op([](el a, el b) { return a * b; }, m, r);
             break;
         case op_div:
-            ejecutar_op([](El a, El b) { return a / b; }, mem, r);
+            ejecutar_op([](el a, el b) { return a / b; }, m, r);
             break;
         case op_pot:
-            ejecutar_op(powl, mem, r);
+            ejecutar_op(powl, m, r);
             break;
         case op_sen:
-            ejecutar_op(sin, mem, r);
+            ejecutar_op(sin, m, r);
             break;
         case op_cos:
-            ejecutar_op(cos, mem, r);
+            ejecutar_op(cos, m, r);
             break;
         case op_tan:
-            ejecutar_op(tan, mem, r);
+            ejecutar_op(tan, m, r);
             break;
         case op_gamma:
-            ejecutar_op(tgamma, mem, r);
+            ejecutar_op(tgamma, m, r);
             break;
         case const_pi:
-            apilar(mem, (El) M_PI);
+            apilar(m, (el) M_PI);
             break;
     }
 }
 
-bool ejecutar(Mem &mem, ifstream &file)
+bool ejecutar(mem &m, ifstream &file)
 {
     string word;
     if(file >> word)
     {
         try
         {
-            El valor = stold(word);
-            apilar(mem, valor);
+            el valor = stold(word);
+            apilar(m, valor);
         }
         catch (const invalid_argument)
         {
             Lit lit = parse_lit(word);
-            El r[NUMERO_REGISTROS];
+            el r[NUMERO_REGISTROS];
             try
             {
-                casos_lit(lit, mem, r); 
+                casos_lit(lit, m, r); 
                 cout << flush;
             }
             catch (PilaVaciaUndef)
@@ -175,18 +175,18 @@ int main(int argc, char ** argv) {
         ifstream file;
         file.open(argv[1]);
         if (!file.is_open()) return 1;
-        Mem *mem = new Mem;
+        mem *m = new mem;
         cout << setprecision(PRECISION);
         try
         {
-            while(ejecutar(*mem, file));
+            while(ejecutar(*m, file));
             cout << endl;
         }
         catch(string err)
         {
             cout << endl << "Error: " << err << endl;
         }
-        delete mem;
+        delete m;
         return 0;
     }
     else return 1;
