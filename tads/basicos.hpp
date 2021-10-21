@@ -8,14 +8,14 @@ using namespace std;
 
 
 template<class T>
-struct Nodo_Simple {
-    T valor;
-    Nodo_Simple<T> * siguiente = nullptr;
+struct nodo_simple {
+    T dato;
+    nodo_simple<T> * siguiente = nullptr;
 };
 
 template<class T>
-struct Nodo_Doble {
-    T valor;
-    Nodo_Simple<T> * siguiente = nullptr;
-    Nodo_Simple<T> * anterior = nullptr;
+struct nodo_doble {
+    T dato;
+    nodo_doble<T> * siguiente = nullptr;
+    nodo_doble<T> *  anterior = nullptr;
 };

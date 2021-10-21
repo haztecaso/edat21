@@ -1,51 +1,46 @@
+#include <iostream>
 #include <string>
 #include <sstream>
 #include <exception>
 
 using namespace std;
 
-const int CAP_INIC = 10;
+const int CAP_INIC = 2;
+const int MULT_CRECIMIENTO = 2;
 
-struct Pila_Int_Struct {
-    int capacidad = CAP_INIC;
-    int tamano = 0;
-    int *contenido = new int[CAP_INIC];
+struct pila_int {
+    int cap = CAP_INIC;
+    int prof = 0;
+    int *datos = new int[CAP_INIC];
 };
 
-typedef Pila_Int_Struct * Pila_Int;
 
 // No hemos definido la constante pila_vacia ya que hay que alocar memoria para
 // definir las pilas vacias.
 
 // Determina si una pila está vacía
-bool es_vacia(Pila_Int pila);
-
-// Constructor para pilas vacías
-Pila_Int crear_pila();
-
-// Constructor para pilas con un elemento
-Pila_Int crear_pila(int valor);
+bool es_vacia(pila_int pila);
 
 // Añade un elemento a la cima de una pila
-void apilar(Pila_Int pila, int valor);
+void apilar(pila_int &pila, int dato);
 
 // Quita la cima de una pila
-void desapilar(Pila_Int pila);
+void desapilar(pila_int &pila);
 
 // Devuelve (sin eliminar) la cima de una pila
-int cima(Pila_Int pila);
+int cima(pila_int pila);
 
 // Devuelve y elimina la cima de una pila
-int cima_y_desapilar(Pila_Int pila);
+int cima_y_desapilar(pila_int &pila);
 
 // Devuelve el tamaño de una pila
-int tamano(Pila_Int pila);
+int profundidad(pila_int pila);
 
 // Libera la memoria de una pila
-void liberar(Pila_Int &pila);
+void liberar(pila_int &pila);
 
 // Sobrecarga del operador << para imprimir las pilas por pantalla
-ostream& operator<<(ostream& os, Pila_Int pila);
+ostream& operator<<(ostream& os, pila_int pila);
 
 // Excepción para funciones parciales no definidas sobre las pilas vacías
 struct PilaVaciaUndef : public exception
@@ -58,79 +53,74 @@ struct PilaVaciaUndef : public exception
 
 // Implementaciones
 
-bool es_vacia(Pila_Int pila)
+bool es_vacia(pila_int pila)
 {
-    return pila->tamano == 0;
+    return pila.prof== 0;
 }
 
-Pila_Int crear_pila()
+void aumentar_cap(pila_int &pila)
 {
-    Pila_Int pila = new Pila_Int_Struct;
-    return pila;
+    int *datos = new int[pila.cap * MULT_CRECIMIENTO];
+    for(int i = 0; i < pila.prof; i++) // Hay alguna manera mejor de hacer esta copia?
+    {
+        datos[i] = pila.datos[i];
+    }
+    cout << endl;
+    delete[] pila.datos;
+    pila.datos = datos;
+    pila.cap *= MULT_CRECIMIENTO;
 }
 
-Pila_Int crear_pila(int valor)
+void apilar(pila_int &pila, int dato)
 {
-    Pila_Int pila = new Pila_Int_Struct;
-    pila->tamano = 1;
-    pila->contenido[0] = valor;
-    return pila;
+    if(pila.prof== pila.cap)
+        aumentar_cap(pila);
+    // cout << "apilar " << dato << "-> [" << pila.prof<< "]" << endl;
+    pila.datos[pila.prof] = dato;
+    pila.prof++;
 }
 
-void aumentar_capacidad(Pila_Int pila)
-{
-    int *contenido = new int[pila->capacidad * 2];
-    for(int i; i < pila->capacidad; i++)
-        contenido[i] = pila->contenido[i]; // Hay alguna manera mejor de hacer esta copia?
-    delete pila->contenido;
-    pila->contenido = contenido;
-    pila->capacidad *= 2;
-}
-
-void apilar(Pila_Int pila, int valor)
-{
-    if(pila->tamano == pila->capacidad)
-        aumentar_capacidad(pila);
-    pila->contenido[pila->tamano - 1] = valor;
-    pila->tamano++;
-}
-
-void desapilar(Pila_Int pila)
+void desapilar(pila_int &pila)
 {
     if(!es_vacia(pila))
-        pila->tamano--;
+        pila.prof--;
     else
         throw PilaVaciaUndef();
 }
 
-int cima(Pila_Int pila)
+int cima(pila_int pila)
 {
     if(!es_vacia(pila))
-        return pila->contenido[pila->tamano - 1];
+        return pila.datos[pila.prof- 1];
     else
         throw PilaVaciaUndef();
 }
 
-int cima_y_desapilar(Pila_Int pila)
+int cima_y_desapilar(pila_int &pila)
 {
     int result = cima(pila);
-    desapilar(pila);
     return result;
 }
 
-int tamano(Pila_Int pila)
+int profundidad(pila_int pila)
 {
-    return pila->tamano;
+    return pila.prof;
 }
 
-void liberar(Pila_Int &pila)
+void liberar(pila_int &pila)
 {
-    delete pila;
+    pila.prof--;
+    if(pila.datos) delete[] pila.datos;
 }
 
-ostream& operator<<(ostream& os, Pila_Int pila)
+ostream& operator<<(ostream& os, pila_int pila)
 {
-    for(int i = 1; i <= pila->tamano; i++)
-        os << pila->contenido[pila->tamano - 1 - i] << " ";
+    os << "[";
+    for(int i = pila.prof - 1; i >= 0; i--)
+    {
+        os << pila.datos[i];
+        if (i > 0) cout << " ";
+    }
+    os << "]";
     return os;
 }

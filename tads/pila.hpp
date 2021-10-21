@@ -9,19 +9,19 @@
 using namespace std;
 
 template<class T>
-struct Pila {
-    Nodo_Simple<T> *nodo = nullptr;
+struct pila {
+    nodo_simple<T> *nodo = nullptr;
     int tamano = 0;
 };
 
-template <class T> bool es_vacia(Pila<T> pila);
-template <class T> void apilar(Pila<T> &pila, T valor);
-template <class T> void desapilar(Pila<T> &pila);
-template <class T> T cima(Pila<T> pila);
-template <class T> int tamano(Pila<T> pila);
-template <class T> T cima_y_desapilar(Pila<T> &pila);
-template <class T> std::ostream& operator<<(std::ostream& os, Pila<T> pila);
-template <class T> std::ostream& operator<<(std::ostream& os, Pila<T> *pila);
+template <class T> bool es_vacia(pila<T> p);
+template <class T> void apilar(pila<T> &p, T d);
+template <class T> void desapilar(pila<T> &p);
+template <class T> T cima(pila<T> p);
+template <class T> int tamano(pila<T> p);
+template <class T> T cima_y_desapilar(pila<T> &p);
+template <class T> std::ostream& operator<<(std::ostream& os, pila<T> p);
+template <class T> std::ostream& operator<<(std::ostream& os, pila<T> *p);
 
 // Implementaciones
 
@@ -33,68 +33,68 @@ struct PilaVaciaUndef : public exception
     }
 };
 
-template <class T> bool es_vacia(Pila<T> pila)
+template <class T> bool es_vacia(pila<T> p)
 {
-    return pila.tamano == 0;
+    return p.tamano == 0;
 }
 
-template <class T> void apilar(Pila<T> &pila, T valor)
+template <class T> void apilar(pila<T> &p, T d)
 {
-    if (es_vacia(pila))
+    if (es_vacia(p))
     {
-        pila = *(new Pila<T>);
-        pila.nodo = new Nodo_Simple<T>;
+        p = *(new pila<T>);
+        p.nodo = new nodo_simple<T>;
     }
     else
     {
-        Nodo_Simple<T> *nodo_nuevo = new Nodo_Simple<T>;
-        nodo_nuevo->siguiente = pila.nodo;
-        pila.nodo = nodo_nuevo;
+        nodo_simple<T> *nodo_nuevo = new nodo_simple<T>;
+        nodo_nuevo->siguiente = p.nodo;
+        p.nodo = nodo_nuevo;
     }
-        pila.nodo->valor = valor;
-        pila.tamano++;
+        p.nodo->dato = d;
+        p.tamano++;
 }
 
-template <class T> void desapilar(Pila<T> &pila)
+template <class T> void desapilar(pila<T> &p)
 {
-    if(!es_vacia(pila))
+    if(!es_vacia(p))
     {
-        Nodo_Simple<T> *nodo_antiguo = pila.nodo;
-        pila.nodo = pila.nodo->siguiente;
+        nodo_simple<T> *nodo_antiguo = p.nodo;
+        p.nodo = p.nodo->siguiente;
         delete nodo_antiguo;
-        pila.tamano--;
+        p.tamano--;
     }
     else
         throw PilaVaciaUndef();
 }
 
-template <class T> T cima(Pila<T> pila)
+template <class T> T cima(pila<T> p)
 {
-    if(!es_vacia(pila))
-        return pila.nodo->valor;
+    if(!es_vacia(p))
+        return p.nodo->dato;
     else
         throw PilaVaciaUndef();
 }
 
-template <class T> int tamano(Pila<T> pila)
+template <class T> int tamano(pila<T> p)
 {
-    return pila.tamano;
+    return p.tamano;
 }
 
-template <class T> T cima_y_desapilar(Pila<T> &pila)
+template <class T> T cima_y_desapilar(pila<T> &p)
 {
-    T result = cima(pila);
-    desapilar(pila);
+    T result = cima(p);
+    desapilar(p);
     return result;
 }
 
-template <class T> std::ostream& operator<<(std::ostream& os, Pila<T> pila)
+template <class T> std::ostream& operator<<(std::ostream& os, pila<T> p)
 {
-    Nodo_Simple<T> *nodo_actual = pila.nodo;
+    nodo_simple<T> *nodo_actual = p.nodo;
     os << "[";
     while (nodo_actual != nullptr)
     {
-        os << nodo_actual->valor;
+        os << nodo_actual->dato;
         if(nodo_actual->siguiente != nullptr)
             os << " ";
             nodo_actual = nodo_actual->siguiente;
@@ -103,8 +103,8 @@ template <class T> std::ostream& operator<<(std::ostream& os, Pila<T> pila)
     return os;
 }
 
-template <class T> std::ostream& operator<<(std::ostream& os, Pila<T> *pila)
+template <class T> std::ostream& operator<<(std::ostream& os, pila<T> *p)
 {
-    os << *pila;
+    os << *p;
     return os;
 }

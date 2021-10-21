@@ -4,44 +4,39 @@
 
 using namespace std;
 
-struct Nodo_Pila_Int {
-    int valor;
-    Nodo_Pila_Int * siguiente;
+struct nodo_simple_int {
+    int dato;
+    nodo_simple_int * siguiente = nullptr;
 };
 
-typedef Nodo_Pila_Int * Pila_Int;
-
-const Pila_Int pila_vacia = nullptr;
+struct pila_int {
+    nodo_simple_int * nodo = nullptr;
+    int tamano = 0;
+};
 
 // Determina si una pila está vacía
-bool es_vacia(Pila_Int pila);
-
-// Constructor para pilas vacías
-Pila_Int crear_pila();
-
-// Constructor para pilas con un elemento
-Pila_Int crear_pila(int valor);
+bool es_vacia(pila_int pila);
 
 // Añade un elemento a la cima de una pila
-void apilar(Pila_Int &pila, int valor);
+void apilar(pila_int &pila, int dato);
 
 // Quita la cima de una pila
-void desapilar(Pila_Int &pila);
+void desapilar(pila_int &pila);
 
 // Devuelve (sin eliminar) la cima de una pila
-int cima(Pila_Int pila);
+int cima(pila_int pila);
 
 // Devuelve y elimina la cima de una pila
-int cima_y_desapilar(Pila_Int &pila);
+int cima_y_desapilar(pila_int &pila);
 
 // Devuelve el tamaño de una pila
-int tamano(Pila_Int pila);
+int tamano(pila_int pila);
 
 // Libera la memoria de una pila
-void liberar(Pila_Int &pila);
+void liberar(pila_int &pila);
 
 // Sobrecarga del operador << para imprimir las pilas por pantalla
-ostream& operator<<(ostream& os, Pila_Int obj);
+ostream& operator<<(ostream& os, pila_int obj);
 
 // Excepción para funciones parciales no definidas sobre las pilas vacías
 struct PilaVaciaUndef : public exception
@@ -55,91 +50,86 @@ struct PilaVaciaUndef : public exception
 
 // Implementaciones
 
-bool es_vacia(Pila_Int pila)
+bool es_vacia(pila_int pila)
 {
-    return pila == pila_vacia;
+    return pila.tamano == 0;
 }
 
-Pila_Int crear_pila()
+nodo_simple_int * crear_nodo(int dato, nodo_simple_int * siguiente)
 {
-    return pila_vacia;
+    nodo_simple_int *nodo = new nodo_simple_int;
+    nodo->dato = dato;
+    nodo->siguiente = siguiente;
+    return nodo;
 }
 
-Pila_Int crear_pila(int valor)
-{
-    Pila_Int pila = new Nodo_Pila_Int;
-    pila->valor = valor;
-    pila->siguiente = pila_vacia;
-    return pila;
-}
-
-void apilar(Pila_Int &pila, int valor)
+void apilar(pila_int &pila, int dato)
 {
     if (es_vacia(pila))
-        pila = crear_pila(valor);
+    {
+        pila.nodo = crear_nodo(dato, nullptr);
+    }
     else
     {
-        Pila_Int nueva = new Nodo_Pila_Int;
-        nueva->valor = valor;
-        nueva->siguiente = pila;
-        pila = nueva;
+        nodo_simple_int *nuevo = crear_nodo(dato, pila.nodo);
+        pila.nodo = nuevo;
     }
+    pila.tamano++;
 }
 
-void desapilar(Pila_Int &pila)
+nodo_simple_int * liberar_nodo_y_avanzar(nodo_simple_int * &nodo)
+{
+    nodo_simple_int * siguiente = nodo->siguiente;
+    delete nodo;
+    nodo = siguiente;
+    return nodo;
+}
+
+void desapilar(pila_int &pila)
 {
     if(!es_vacia(pila))
     {
-        Pila_Int old = pila;
-        pila = pila->siguiente;
-        delete old;
+        liberar_nodo_y_avanzar(pila.nodo);
+        pila.tamano--;
     }
     else
         throw PilaVaciaUndef();
 }
 
-int cima(Pila_Int pila)
+int cima(pila_int pila)
 {
     if(!es_vacia(pila))
     {
-        return pila->valor;
+        return pila.nodo->dato;
     }
     else
         throw PilaVaciaUndef();
 }
 
-int cima_y_desapilar(Pila_Int &pila){
+int cima_y_desapilar(pila_int &pila){
     int result = cima(pila);
     desapilar(pila);
     return result;
 }
 
-int tamano(Pila_Int pila)
+int tamano(pila_int pila)
 {
-    int result = 0;
-    Pila_Int actual = pila;
-    while (!es_vacia(actual))
-    {
-        actual = actual->siguiente;
-        result++;
-    }
-    return result;
+    return pila.tamano;
 }
 
-void liberar(Pila_Int &pila)
+void liberar(pila_int &pila)
 {
     while (!es_vacia(pila))
         desapilar(pila);
-    delete pila;
 }
 
-ostream& operator<<(ostream& os, Pila_Int obj)
+ostream& operator<<(ostream& os, pila_int pila)
 {
-    Pila_Int actual = obj;
-    while (!es_vacia(actual))
+    nodo_simple_int *nodo_actual = pila.nodo;
+    while (nodo_actual != nullptr)
     {
-        os << actual->valor << " ";
-        actual = actual->siguiente;
+        os << nodo_actual->dato << " ";
+        nodo_actual = nodo_actual->siguiente;
     }
     return os;
 }

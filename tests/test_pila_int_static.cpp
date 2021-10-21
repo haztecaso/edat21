@@ -4,17 +4,22 @@
 using namespace std;
 
 int main(){
-    Pila_Int p = crear_pila();
+    pila_int p;
+    int i = 1;
+    int j = 1;
+    int tmp;
 
-    apilar(p, 69);
-    apilar(p, 420);
-    apilar(p, 108);
+    for(int k = 0; k <= 32; k++){
+        apilar(p, i);
+        tmp = i + j;
+        i = j;
+        j = tmp;
+    }
 
     cout << p << endl;
-
     liberar(p);
-
     cout << p << endl;
+
 
     return 0;
 }

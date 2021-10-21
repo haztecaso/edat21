@@ -9,19 +9,19 @@
 using namespace std;
 
 template<class T>
-struct Cola {
-    Nodo_Simple<T> *primero = nullptr;
-    Nodo_Simple<T> *ultimo  = nullptr;
+struct cola {
+    nodo_simple<T> *primero = nullptr;
+    nodo_simple<T> *ultimo  = nullptr;
     int tamano = 0;
 };
 
-template <class T> bool es_vacia(Cola<T> cola);
-template <class T> void pedir_vez(Cola<T> &cola, T valor);
-template <class T> void avanzar(Cola<T> &cola);
-template <class T> T primero(Cola<T> cola);
-template <class T> int tamano(Cola<T> cola);
-template <class T> std::ostream& operator<<(std::ostream& os, Cola<T> cola);
-template <class T> std::ostream& operator<<(std::ostream& os, Cola<T> *cola);
+template <class T> bool es_vacia(cola<T> c);
+template <class T> void pedir_vez(cola<T> &c, T d);
+template <class T> void avanzar(cola<T> &c);
+template <class T> T primero(cola<T> c);
+template <class T> int tamano(cola<T> c);
+template <class T> std::ostream& operator<<(std::ostream& os, cola<T> c);
+template <class T> std::ostream& operator<<(std::ostream& os, cola<T> *c);
 
 struct ColaVaciaUndef : public exception
 {
@@ -33,63 +33,63 @@ struct ColaVaciaUndef : public exception
 
 // Implementaciones
 
-template <class T> bool es_vacia(Cola<T> cola)
+template <class T> bool es_vacia(cola<T> c)
 {
-    return cola.tamano == 0;
+    return c.tamano == 0;
 }
 
-template <class T> void pedir_vez(Cola<T> &cola, T valor)
+template <class T> void pedir_vez(cola<T> &c, T d)
 {
-    if (es_vacia(cola))
+    if (es_vacia(c))
     {
-        cola = *(new Cola<T>);
-        cola.primero = new Nodo_Simple<T>;
-        cola.ultimo = cola.primero;
+        c = *(new cola<T>);
+        c.primero = new nodo_simple<T>;
+        c.ultimo = c.primero;
     }
     else
     {
-        Nodo_Simple<T> *nodo_nuevo = new Nodo_Simple<T>;
-        cola.ultimo->siguiente = nodo_nuevo;
-        cola.ultimo = nodo_nuevo;
+        nodo_simple<T> *nodo_nuevo = new nodo_simple<T>;
+        c.ultimo->siguiente = nodo_nuevo;
+        c.ultimo = nodo_nuevo;
     }
-        cola.ultimo->valor = valor;
-        cola.tamano++;
+        c.ultimo->dato = d;
+        c.tamano++;
 }
 
-template <class T> void avanzar(Cola<T> &cola)
+template <class T> void avanzar(cola<T> &c)
 {
-    if(!es_vacia(cola))
+    if(!es_vacia(c))
     {
-        Nodo_Simple<T> *nodo_antiguo = cola.primero;
-        cola.primero = cola.primero->siguiente;
+        nodo_simple<T> *nodo_antiguo = c.primero;
+        c.primero = c.primero->siguiente;
         delete nodo_antiguo;
-        cola.tamano--;
+        c.tamano--;
     }
     else
         throw ColaVaciaUndef();
 }
 
-template <class T> T primero(Cola<T> cola)
+template <class T> T primero(cola<T> c)
 {
-    if(!es_vacia(cola))
-        return cola.primero->valor;
+    if(!es_vacia(c))
+        return c.primero->dato;
     else
         throw ColaVaciaUndef();
 }
 
-template <class T> int tamano(Cola<T> cola)
+template <class T> int tamano(cola<T> c)
 {
-    return cola.tamano;
+    return c.tamano;
 }
 
-template <class T> std::ostream& operator<<(std::ostream& os, Cola<T> cola)
+template <class T> std::ostream& operator<<(std::ostream& os, cola<T> c)
 {
     os << "[";
-    Nodo_Simple<T> *nodo_actual = cola.primero;
+    nodo_simple<T> *nodo_actual = c.primero;
     while (nodo_actual != nullptr)
     {
-        os << nodo_actual->valor;
-        if (nodo_actual != cola.ultimo)
+        os << nodo_actual->dato;
+        if (nodo_actual != c.ultimo)
             os << " ";
         nodo_actual = nodo_actual->siguiente;
     }
@@ -97,8 +97,8 @@ template <class T> std::ostream& operator<<(std::ostream& os, Cola<T> cola)
     return os;
 }
 
-template <class T> std::ostream& operator<<(std::ostream& os, Cola<T> *cola)
+template <class T> std::ostream& operator<<(std::ostream& os, cola<T> *c)
 {
-    os << *cola;
+    os << *c;
     return os;
 }

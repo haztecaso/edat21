@@ -5,12 +5,12 @@
 using namespace std;
 
 typedef string El;
-typedef Pila<Pila<El> *> SuperPila;
+typedef pila<pila<El> *> super_pila;
 
 int main(){
-    SuperPila *sp = new SuperPila;
-    Pila<El> *p1 = new Pila<El>;
-    Pila<El> *p2 = new Pila<El>;
+    super_pila *sp = new super_pila;
+    pila<El> *p1 = new pila<El>;
+    pila<El> *p2 = new pila<El>;
 
     apilar(*sp, p1);
     apilar(*sp, p2);

@@ -4,11 +4,15 @@
 using namespace std;
 
 int main(){
-    Pila_Int p = crear_pila();
+    pila_int p;
 
     apilar(p, 69);
     apilar(p, 420);
     apilar(p, 108);
+
+    cout << p << endl;
+
+    desapilar(p);
 
     cout << p << endl;
 
