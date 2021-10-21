@@ -99,6 +99,6 @@ template <class T> std::ostream& operator<<(std::ostream& os, cola<T> c)
 
 template <class T> std::ostream& operator<<(std::ostream& os, cola<T> *c)
 {
-    os << *c;
+    os << "*" << *c;
     return os;
 }

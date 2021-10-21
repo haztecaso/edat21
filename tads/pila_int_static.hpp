@@ -1,4 +1,3 @@
-#include <iostream>
 #include <string>
 #include <sstream>
 #include <exception>
@@ -65,7 +64,6 @@ void aumentar_cap(pila_int &pila)
     {
         datos[i] = pila.datos[i];
     }
-    cout << endl;
     delete[] pila.datos;
     pila.datos = datos;
     pila.cap *= MULT_CRECIMIENTO;
@@ -75,7 +73,6 @@ void apilar(pila_int &pila, int dato)
 {
     if(pila.prof== pila.cap)
         aumentar_cap(pila);
-    // cout << "apilar " << dato << "-> [" << pila.prof<< "]" << endl;
     pila.datos[pila.prof] = dato;
     pila.prof++;
 }
@@ -99,6 +96,7 @@ int cima(pila_int pila)
 int cima_y_desapilar(pila_int &pila)
 {
     int result = cima(pila);
+    desapilar(pila);
     return result;
 }
 
@@ -119,7 +117,7 @@ ostream& operator<<(ostream& os, pila_int pila)
     for(int i = pila.prof - 1; i >= 0; i--)
     {
         os << pila.datos[i];
-        if (i > 0) cout << " ";
+        if (i > 0) os << " ";
     }
     os << "]";
     return os;

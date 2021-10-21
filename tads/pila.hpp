@@ -105,6 +105,6 @@ template <class T> std::ostream& operator<<(std::ostream& os, pila<T> p)
 
 template <class T> std::ostream& operator<<(std::ostream& os, pila<T> *p)
 {
-    os << *p;
+    os << "*" << *p;
     return os;
 }
