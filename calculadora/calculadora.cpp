@@ -16,7 +16,7 @@ typedef pila<el> mem;
 typedef el *reg;
 
 
-enum Lit {
+enum token {
     op_dump,
     op_print,
     op_printall,
@@ -34,17 +34,8 @@ enum Lit {
     const_pi,
 };
 
-const string ops_1[] = {
-    "sen",
-    "cos",
-    "tan",
-    "asen",
-    "acos",
-    "atan",
-};
-
-Lit parse_op(string lit);
-void casos_lit(Lit lit, mem &m, reg r);
+token parse_op(string word);
+void casos_token(token t, mem &m, reg r);
 bool ejecutar(mem &m, ifstream &file);
 void ejecutar_op(el (*fn)(el), mem &m, reg r);
 void ejecutar_op(el (*fn)(el, el), mem &m, reg r);
@@ -64,29 +55,29 @@ void ejecutar_op(el (*fn)(el, el), mem &m, reg r)
 }
 
 
-Lit parse_lit(string lit)
+token parse_token(string word)
 {
-    if (lit == "d") return op_dump;
-    if (lit == "P") return op_printall;
-    if (lit == "=") return op_print;
-    if (lit == "p") return op_dumpprint;
-    if (lit == "dup") return op_dup;
-    if (lit == "+") return op_suma;
-    if (lit == "-") return op_resta;
-    if (lit == "*") return op_mult;
-    if (lit == "/") return op_div;
-    if (lit == "^") return op_pot;
-    if (lit == "sen") return op_sen;
-    if (lit == "cos") return op_cos;
-    if (lit == "tan") return op_tan;
-    if (lit == "G") return op_gamma;
-    if (lit == "PI") return const_pi;
-    throw "`"+ lit + "` literal unknown";
+    if (word == "d") return op_dump;
+    if (word == "P") return op_printall;
+    if (word == "=") return op_print;
+    if (word == "p") return op_dumpprint;
+    if (word == "dup") return op_dup;
+    if (word == "+") return op_suma;
+    if (word == "-") return op_resta;
+    if (word == "*") return op_mult;
+    if (word == "/") return op_div;
+    if (word == "^") return op_pot;
+    if (word == "sen") return op_sen;
+    if (word == "cos") return op_cos;
+    if (word == "tan") return op_tan;
+    if (word == "G") return op_gamma;
+    if (word == "PI") return const_pi;
+    throw "`"+ word + "` word unknown";
 }
 
-void casos_lit(Lit lit, mem &m, reg r)
+void casos_token(token t, mem &m, reg r)
 {
-    switch(lit)
+    switch(t)
     {
         case op_dump:
             desapilar(m);
@@ -151,11 +142,11 @@ bool ejecutar(mem &m, ifstream &file)
         }
         catch (const invalid_argument)
         {
-            Lit lit = parse_lit(word);
+            token t = parse_token(word);
             el r[NUMERO_REGISTROS];
             try
             {
-                casos_lit(lit, m, r); 
+                casos_token(t, m, r); 
                 cout << flush;
             }
             catch (PilaVaciaUndef)
