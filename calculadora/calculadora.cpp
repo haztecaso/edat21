@@ -11,6 +11,7 @@
 
 #define PRECISION 12
 #define NUMERO_REGISTROS 16
+#define PROMPT ">> "
 
 using namespace std;
 
@@ -18,8 +19,9 @@ typedef long double el;
 typedef pila<el> mem;
 typedef el *reg;
 
-bool interactive = false; //TODO: Evitar variable global
-bool printed = false; //TODO: Evitar variable global
+//TODO: Evitar variables globales
+bool interactive = false;
+bool printed = false;
 
 enum token {
     op_dump,
@@ -228,7 +230,6 @@ void casos_token(token t, mem &m, reg r)
     }
 }
 
-
 void ejecutar(mem &m, reg r, stringstream &source)
 {
     string word;
@@ -268,7 +269,8 @@ void inicializar_registro(reg r)
         r[i] = 0;
 }
 
-void ejecutar_fichero(char * nombre) 
+// LEER PROGRAMA DESDE FICHERO 
+void ejecutar(char * nombre) 
 {
     ifstream file;
     file.open(nombre);
@@ -292,11 +294,12 @@ void ejecutar_fichero(char * nombre)
     delete m;
 }
 
-void modo_interactivo()
+// MODO INTERACTIVO
+void ejecutar()
 {
     interactive = true;
     char input[256];
-    cout << ">> ";
+    cout << PROMPT;
     mem *m = new mem;
     el r[NUMERO_REGISTROS];
     inicializar_registro(r);
@@ -306,14 +309,14 @@ void modo_interactivo()
         printed = false;
         ejecutar(*m, r, source);
         if(!es_vacia(*m) && !printed) cout << cima(*m) << endl;
-        cout << ">> ";
+        cout << PROMPT;
     }
 }
 
 int main(int argc, char ** argv) {
     if (argc >= 2)
-        ejecutar_fichero(argv[1]);
+        ejecutar(argv[1]);
     else
-        modo_interactivo();
+        ejecutar();
     return 0;
 }
