@@ -1,10 +1,14 @@
 #include <iostream>
+#include <istream>
 #include <fstream>
+#include <sstream>
 #include <iomanip>
 #include <functional>
 #include <cmath>
 
+#include "basicos.hpp"
 #include "pila.hpp"
+#include "cola.hpp"
 
 #define PRECISION 12
 #define NUMERO_REGISTROS 2
@@ -15,13 +19,18 @@ typedef long double el;
 typedef pila<el> mem;
 typedef el *reg;
 
+//TODO: Evitar variable global
+
+bool interactive = false;
 
 enum token {
     op_dump,
+    op_dumpall,
     op_print,
     op_printall,
     op_dumpprint,
     op_dup,
+    op_swap,
     op_suma,
     op_resta,
     op_mult,
@@ -54,14 +63,31 @@ void ejecutar_op(el (*fn)(el, el), mem &m, reg r)
     apilar(m, fn(r[0], r[1]));
 }
 
+void print_mem(mem &m)
+{
+    nodo_simple<el> *e = m.nodo;
+    if(es_vacia(m))
+    {
+        cout << "memoria vacía";
+    }
+    while (e != nullptr)
+    {
+        cout << "  " << e->dato;
+        if(e->siguiente != nullptr)
+            cout << endl;
+            e = e->siguiente;
+    }
+}
 
 token parse_token(string word)
 {
     if (word == "d") return op_dump;
+    if (word == "D") return op_dumpall;
     if (word == "P") return op_printall;
     if (word == "=") return op_print;
     if (word == "p") return op_dumpprint;
     if (word == "dup") return op_dup;
+    if (word == "swap" || word == "sw") return op_swap;
     if (word == "+") return op_suma;
     if (word == "-") return op_resta;
     if (word == "*") return op_mult;
@@ -82,20 +108,34 @@ void casos_token(token t, mem &m, reg r)
         case op_dump:
             desapilar(m);
             break;
+        case op_dumpall:
+            while(!es_vacia(m))
+                desapilar(m);
+            break;
         case op_print:
             r[0] = cima(m);
             cout << r[0] << " ";
+            if (interactive) cout << endl;
             break;
         case op_printall:
-            cout << m;
+            // cout << m;
+            print_mem(m);
+            if (interactive) cout << endl;
             break;
         case op_dumpprint:
             r[0] = cima_y_desapilar(m);
             cout << r[0] << " ";
+            if (interactive) cout << endl;
             break;
         case op_dup:
             r[0] = cima(m);
             apilar(m, r[0]);
+            break;
+        case op_swap:
+            r[0] = cima_y_desapilar(m);
+            r[1] = cima_y_desapilar(m);
+            apilar(m, r[0]);
+            apilar(m, r[1]);
             break;
         case op_suma:
             ejecutar_op([](el a, el b) { return a + b; }, m, r);
@@ -130,10 +170,11 @@ void casos_token(token t, mem &m, reg r)
     }
 }
 
-bool ejecutar(mem &m, ifstream &file)
+
+void ejecutar(mem &m, stringstream &source)
 {
     string word;
-    if(file >> word)
+    if(source >> word)
     {
         try
         {
@@ -142,43 +183,68 @@ bool ejecutar(mem &m, ifstream &file)
         }
         catch (const invalid_argument)
         {
-            token t = parse_token(word);
-            el r[NUMERO_REGISTROS];
-            try
+            try{
+                token t = parse_token(word);
+                el r[NUMERO_REGISTROS];
+                try
+                {
+                    casos_token(t, m, r); 
+                    cout << flush;
+                }
+                catch (PilaVaciaUndef)
+                {
+                    cout << "ERROR: memoria vacía." << endl;
+                }
+            } catch(string s)
             {
-                casos_token(t, m, r); 
-                cout << flush;
-            }
-            catch (PilaVaciaUndef)
-            {
-                throw "PilaVacia. No se ha podido ejecutar `" + word + "`";
+                cout << "ERROR: " << s << endl;
             }
         }
-        return true;
+        ejecutar(m, source);
     }
-    else return false;
 }
 
+void ejecutar_fichero(char * nombre) 
+{
+    ifstream file;
+    file.open(nombre);
+    // if (!file.is_open()) return 1;
+    mem *m = new mem;
+    cout << setprecision(PRECISION);
+    try
+    {
+        stringstream source;
+        source << file.rdbuf();
+        file.close();
+        ejecutar(*m, source);
+        cout << endl;
+    }
+    catch(string err)
+    {
+        cout << endl << "Error: " << err << endl;
+    }
+    delete m;
+}
+
+void modo_interactivo()
+{
+    interactive = true;
+    char input[256];
+    cout << ">> ";
+    mem *m = new mem;
+    while(cin.getline(input, 256))
+    {
+        stringstream source = stringstream(string(input));
+        ejecutar(*m, source);
+        cout << "mem: " << *m << endl;
+        cout << ">> ";
+    }
+}
 
 int main(int argc, char ** argv) {
     if (argc >= 2)
-    {
-        ifstream file;
-        file.open(argv[1]);
-        if (!file.is_open()) return 1;
-        mem *m = new mem;
-        cout << setprecision(PRECISION);
-        try
-        {
-            while(ejecutar(*m, file));
-            cout << endl;
-        }
-        catch(string err)
-        {
-            cout << endl << "Error: " << err << endl;
-        }
-        delete m;
-        return 0;
-    }
-    else return 1;
+        ejecutar_fichero(argv[1]);
+    else
+        modo_interactivo();
+    return 0;
 }
