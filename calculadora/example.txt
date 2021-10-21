@@ -1,3 +1,7 @@
-3 3 ^ 2 / = 
-PI 3 / cos = 
-sen = 
+e pi ^
+pi e ^
+- =
+
+pi 3 / cos
+pi 3 / sen 
+- =

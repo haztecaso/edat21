@@ -1,5 +1,4 @@
 #include <iostream>
-#include <istream>
 #include <fstream>
 #include <sstream>
 #include <iomanip>
@@ -11,7 +10,7 @@
 #include "cola.hpp"
 
 #define PRECISION 12
-#define NUMERO_REGISTROS 2
+#define NUMERO_REGISTROS 16
 
 using namespace std;
 
@@ -19,17 +18,20 @@ typedef long double el;
 typedef pila<el> mem;
 typedef el *reg;
 
-//TODO: Evitar variable global
-
-bool interactive = false;
+bool interactive = false; //TODO: Evitar variable global
+bool printed = false; //TODO: Evitar variable global
 
 enum token {
     op_dump,
     op_dumpall,
     op_print,
+    op_printmem,
+    op_printreg,
     op_printall,
     op_dumpprint,
     op_dup,
+    op_2dup,
+    op_over,
     op_swap,
     op_suma,
     op_resta,
@@ -40,53 +42,60 @@ enum token {
     op_cos,
     op_tan,
     op_gamma,
+    op_read,
+    op_store,
     const_pi,
+    const_e,
 };
 
-token parse_op(string word);
-void casos_token(token t, mem &m, reg r);
-bool ejecutar(mem &m, ifstream &file);
-void ejecutar_op(el (*fn)(el), mem &m, reg r);
-void ejecutar_op(el (*fn)(el, el), mem &m, reg r);
+struct SinParametros: public exception
+{
+    const char * what () const throw ()
+    {
+        return "Faltan parámetros para poder ejecutar la operación";
+    }
+};
 
+void require_params(mem m, int n)
+{
+    if (m.tamano < n)
+        throw "La operación requiere " + to_string(n) + " parámetros";
+}
 
 void ejecutar_op(el (*fn)(el), mem &m, reg r)
 {
-    r[0] = cima_y_desapilar(m);
-    apilar(m, fn(r[0]));
+    require_params(m, 1);
+    el x = cima_y_desapilar(m);
+    apilar(m, fn(x));
 }
 
 void ejecutar_op(el (*fn)(el, el), mem &m, reg r)
 {
-    r[1] = cima_y_desapilar(m);
-    r[0] = cima_y_desapilar(m);
-    apilar(m, fn(r[0], r[1]));
+    require_params(m, 2);
+    el b = cima_y_desapilar(m);
+    el a = cima_y_desapilar(m);
+    apilar(m, fn(a, b));
 }
 
-void print_mem(mem &m)
+void print_reg(reg r)
 {
-    nodo_simple<el> *e = m.nodo;
-    if(es_vacia(m))
-    {
-        cout << "memoria vacía";
-    }
-    while (e != nullptr)
-    {
-        cout << "  " << e->dato;
-        if(e->siguiente != nullptr)
-            cout << endl;
-            e = e->siguiente;
-    }
+    cout << "reg: ";
+    for (int i = 0; i < NUMERO_REGISTROS; i++)
+        cout << r[i] << " ";
 }
 
 token parse_token(string word)
 {
     if (word == "d") return op_dump;
     if (word == "D") return op_dumpall;
+    if (word == "M") return op_printmem;
+    if (word == "R") return op_printreg;
     if (word == "P") return op_printall;
     if (word == "=") return op_print;
     if (word == "p") return op_dumpprint;
     if (word == "dup") return op_dup;
+    if (word == "ddup") return op_2dup;
+    if (word == "over") return op_over;
     if (word == "swap" || word == "sw") return op_swap;
     if (word == "+") return op_suma;
     if (word == "-") return op_resta;
@@ -97,12 +106,16 @@ token parse_token(string word)
     if (word == "cos") return op_cos;
     if (word == "tan") return op_tan;
     if (word == "G") return op_gamma;
-    if (word == "PI") return const_pi;
+    if (word == "pi" || word == "PI") return const_pi;
+    if (word == "e" || word == "E") return const_e;
+    if (word == "," || word == "read") return op_read;
+    if (word == "." || word == "store") return op_store;
     throw "`"+ word + "` word unknown";
 }
 
 void casos_token(token t, mem &m, reg r)
 {
+    el rd0, rd1;
     switch(t)
     {
         case op_dump:
@@ -113,29 +126,61 @@ void casos_token(token t, mem &m, reg r)
                 desapilar(m);
             break;
         case op_print:
-            r[0] = cima(m);
-            cout << r[0] << " ";
+            require_params(m, 1);
+            rd0 = cima(m);
+            cout << rd0 << " ";
             if (interactive) cout << endl;
+            printed = true;
+            break;
+        case op_printreg:
+            print_reg(r);
+            if (interactive) cout << endl;
+            printed = true;
+            break;
+        case op_printmem:
+            cout << "mem: " << m;
+            if (interactive) cout << endl;
+            printed = true;
             break;
         case op_printall:
-            // cout << m;
-            print_mem(m);
+            cout << "mem: " << m << endl;
+            print_reg(r);
             if (interactive) cout << endl;
+            printed = true;
             break;
         case op_dumpprint:
-            r[0] = cima_y_desapilar(m);
-            cout << r[0] << " ";
+            require_params(m, 1);
+            rd0 = cima_y_desapilar(m);
+            cout << rd0 << " ";
             if (interactive) cout << endl;
+            printed = true;
             break;
         case op_dup:
-            r[0] = cima(m);
-            apilar(m, r[0]);
+            require_params(m, 1);
+            rd0 = cima(m);
+            apilar(m, rd0);
+            break;
+        case op_2dup:
+            require_params(m, 2);
+            rd0 = cima_y_desapilar(m);
+            rd1 = cima(m);
+            apilar(m, rd0);
+            apilar(m, rd1);
+            apilar(m, rd0);
+            break;
+        case op_over:
+            require_params(m, 2);
+            rd0 = cima_y_desapilar(m);
+            rd1 = cima(m);
+            apilar(m, rd0);
+            apilar(m, rd1);
             break;
         case op_swap:
-            r[0] = cima_y_desapilar(m);
-            r[1] = cima_y_desapilar(m);
-            apilar(m, r[0]);
-            apilar(m, r[1]);
+            require_params(m, 2);
+            rd0 = cima_y_desapilar(m);
+            rd1 = cima_y_desapilar(m);
+            apilar(m, rd0);
+            apilar(m, rd1);
             break;
         case op_suma:
             ejecutar_op([](el a, el b) { return a + b; }, m, r);
@@ -164,14 +209,27 @@ void casos_token(token t, mem &m, reg r)
         case op_gamma:
             ejecutar_op(tgamma, m, r);
             break;
+        case op_read: // indice read
+            require_params(m, 1);
+            rd0 = cima_y_desapilar(m);
+            apilar(m, r[(int) rd0]);
+            break;
+        case op_store: // valor indice store
+            rd0 = (int) cima_y_desapilar(m); // indice
+            rd1 = cima_y_desapilar(m); // valor
+            r[(int) rd0] = rd1;
+            break;
         case const_pi:
             apilar(m, (el) M_PI);
+            break;
+        case const_e:
+            apilar(m, (el) M_E);
             break;
     }
 }
 
 
-void ejecutar(mem &m, stringstream &source)
+void ejecutar(mem &m, reg r, stringstream &source)
 {
     string word;
     if(source >> word)
@@ -185,7 +243,6 @@ void ejecutar(mem &m, stringstream &source)
         {
             try{
                 token t = parse_token(word);
-                el r[NUMERO_REGISTROS];
                 try
                 {
                     casos_token(t, m, r); 
@@ -195,28 +252,37 @@ void ejecutar(mem &m, stringstream &source)
                 {
                     cout << "ERROR: memoria vacía." << endl;
                 }
-            } catch(string s)
+            }
+            catch(string s)
             {
                 cout << "ERROR: " << s << endl;
             }
         }
-        ejecutar(m, source);
+        ejecutar(m, r, source);
     }
+}
+
+void inicializar_registro(reg r)
+{
+    for (int i = 0; i < NUMERO_REGISTROS; i++)
+        r[i] = 0;
 }
 
 void ejecutar_fichero(char * nombre) 
 {
     ifstream file;
     file.open(nombre);
-    // if (!file.is_open()) return 1;
+    if (!file.is_open()) throw "ERROR: Archivo abierto";
     mem *m = new mem;
+    el r[NUMERO_REGISTROS];
+    inicializar_registro(r);
     cout << setprecision(PRECISION);
     try
     {
         stringstream source;
         source << file.rdbuf();
         file.close();
-        ejecutar(*m, source);
+        ejecutar(*m, r, source);
         cout << endl;
     }
     catch(string err)
@@ -232,11 +298,14 @@ void modo_interactivo()
     char input[256];
     cout << ">> ";
     mem *m = new mem;
+    el r[NUMERO_REGISTROS];
+    inicializar_registro(r);
     while(cin.getline(input, 256))
     {
         stringstream source = stringstream(string(input));
-        ejecutar(*m, source);
-        cout << "mem: " << *m << endl;
+        printed = false;
+        ejecutar(*m, r, source);
+        if(!es_vacia(*m) && !printed) cout << cima(*m) << endl;
         cout << ">> ";
     }
 }
