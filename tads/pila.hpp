@@ -17,6 +17,7 @@ struct pila {
 template <class T> bool es_vacia(pila<T> p);
 template <class T> void apilar(pila<T> &p, T d);
 template <class T> void desapilar(pila<T> &p);
+template <class T> void liberar(pila<T> &p);
 template <class T> T cima(pila<T> p);
 template <class T> int tamano(pila<T> p);
 template <class T> T cima_y_desapilar(pila<T> &p);
@@ -66,6 +67,12 @@ template <class T> void desapilar(pila<T> &p)
     }
     else
         throw PilaVaciaUndef();
+}
+
+template <class T> void liberar(pila<T> &p)
+{
+    while(!es_vacia(p))
+        desapilar(p);
 }
 
 template <class T> T cima(pila<T> p)
