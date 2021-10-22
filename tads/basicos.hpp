@@ -19,3 +19,17 @@ struct nodo_doble {
     nodo_doble<T> * siguiente = nullptr;
     nodo_doble<T> *  anterior = nullptr;
 };
+
+// Función para crear e inicializar un nuevo nodo simple dado un dato y un nodo siguiente.
+template <class T> nodo_simple<T> * crear_nodo_simple(T d, nodo_simple<T> * s);
+
+
+//IMPLEMENTACIONES
+
+template <class T> nodo_simple<T> * crear_nodo_simple(T d, nodo_simple<T> * s)
+{
+    nodo_simple<T> *nodo = new nodo_simple<T>;
+    nodo->dato = d;
+    nodo->siguiente= s;
+    return nodo;
+}
