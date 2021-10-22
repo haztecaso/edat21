@@ -1,11 +1,23 @@
+/*
+ * Colas - Implementación estática 
+ *
+ * Jorge González Gutiérrez
+ * Adrián Lattes Grassi
+ * Fernando Montero Erustes
+ *
+ */
+
 #include<iostream>
 #include <exception>
+
+#pragma once
 
 using namespace std;
 
 const int CAP_INIC = 16;
 const int MULT_CRECIMIENTO = 2;
 
+// Definición del tipo para las colas
 // Representación de las colas mediante arrays circulares.
 // Los valores por defecto corresponden con la representación de una cola vacía
 template<class T>
@@ -17,8 +29,7 @@ struct cola {
     int capacidad = CAP_INIC;
 };
 
-// Excepción que lanzan las operaciones parciales que no están definidas para
-// las pilas vacías
+// Excepción que lanzan las operaciones parciales que no están definidas para las colas vacías
 struct ColaVaciaUndef : public exception
 {
     const char * what () const throw ()
@@ -41,16 +52,15 @@ template <class T> void ampliar_memoria(cola<T> &c);
 template <class T> void encolar(cola<T> &c, T d);
 
 // Elimina el primer elemento de una cola
-// Lanza una excepción si la cola es vacía 
+// Función parcial: lanza una excepción ColaVaciaUndef si la cola es vacía 
 template <class T> void desencolar(cola<T> &c);
 
 // Devuelve el primer elemento de una cola (sin sacarlo de la cola)
-// Lanza una excepción si la cola es vacía 
+// Función parcial: lanza una excepción ColaVaciaUndef si la cola es vacía 
 template <class T> T primero(cola<T> c);
 
 // Libera la memoria de una cola
 template <class T> void liberar(cola<T> &c);
-
 
 // Sobrecarga del operador << para imprimir las colas
 template <class T> ostream& operator<<(ostream& os, cola<T> c);
@@ -58,7 +68,9 @@ template <class T> ostream& operator<<(ostream& os, cola<T> c);
 // Sobrecarga del operador << para imprimir punteros a colas
 template <class T> ostream& operator<<(ostream& os, cola<T> *c);
 
-// IMPLEMENTACIONES
+/*
+ * IMPLEMENTACIONES
+ */
 
 template<class T> bool es_vacia(cola<T> c)
 {

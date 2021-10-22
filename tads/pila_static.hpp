@@ -1,39 +1,62 @@
+/*
+ * Pilas - Implementación estática
+ *
+ * Jorge González Gutiérrez
+ * Adrián Lattes Grassi
+ * Fernando Montero Erustes
+ *
+ */
+
 #include <string>
 #include <sstream>
 #include <exception>
 
 using namespace std;
 
-const int CAP_INIC = 2;
+const int capacidad_INIC = 2;
 const int MULT_CRECIMIENTO = 2;
 
+// Definición del tipo para las pilas
+// Los valores por defecto corresponden con la representación de una pila vacía
 template<class T>
 struct pila {
-    int cap = CAP_INIC;
-    int prof = 0;
-    T *datos = new T[CAP_INIC];
+    int capacidad = capacidad_INIC;
+    int tamano = 0;
+    T *datos = new T[capacidad_INIC];
 };
 
-// No hemos definido la constante pila_vacia ya que hay que alocar memoria para
-// definir las pilas vacias.
+// Excepción que lanzan las operaciones parciales que no están definidas para las colas vacías
+struct PilaVaciaUndef : public exception
+{
+    const char * what () const throw ()
+    {
+        return "Operación no definida para las pilas vacías";
+    }
+};
 
 // Determina si una pila está vacía
 template<class T> bool es_vacia(pila<T> p);
 
-// Añade un elemento a la cima de una pila
+// Duplica el tamaño del array de datos de una pila
+template <class T> void ampliar_memoria(pila<T> &p);
+
+// Añade un elemento en la cima de una pila
 template<class T> void apilar(pila<T> &p, T dato);
 
-// Quita la cima de una pila
+// Elimina la cima de una pila
+// Función parcial: lanza una excepción PilaVaciaUndef si la pila es vacía 
 template<class T> void desapilar(pila<T> &p);
 
-// Devuelve (sin eliminar) la cima de una pila
+// Devuelve la cima de una pila (sin sacarla de la pila)
+// Función parcial: lanza una excepción PilaVaciaUndef si la pila es vacía 
 template <class T> T cima(pila<T> p);
 
 // Devuelve y elimina la cima de una pila
+// Función parcial: lanza una excepción PilaVaciaUndef si la pila es vacía 
 template <class T> T cima_y_desapilar(pila<T> &p);
 
 // Devuelve el tamaño de una pila
-template <class T> int profundidad(pila<T> p);
+template <class T> int tamanoundidad(pila<T> p);
 
 // Libera la memoria de una pila
 template <class T> void liberar(pila<T> &p);
@@ -44,51 +67,45 @@ template <class T> ostream& operator<<(ostream& os, pila<T> p);
 // Sobrecarga del operador << para imprimir punteros a pilas por pantalla
 template <class T> ostream& operator<<(ostream& os, pila<T> *p);
 
-// Excepción para funciones parciales no definidas sobre las pilas vacías
-struct PilaVaciaUndef : public exception
-{
-    const char * what () const throw ()
-    {
-        return "Operación no definida para las pilas vacías";
-    }
-};
+/*
+ * IMPLEMENTACIONES
+ */
 
-// Implementaciones
 template <class T> bool es_vacia(pila<T> p)
 {
-    return p.prof== 0;
+    return p.tamano== 0;
 }
 
-template <class T> void aumentar_cap(pila<T> &p)
+template <class T> void ampliar_memoria(pila<T> &p)
 {
-    T *datos = new T[p.cap * MULT_CRECIMIENTO];
-    for(int i = 0; i < p.prof; i++) // Hay alguna manera mejor de hacer esta copia?
+    T *datos = new T[p.capacidad * MULT_CRECIMIENTO];
+    for(int i = 0; i < p.tamano; i++) // Hay alguna manera mejor de hacer esta copia?
     {
         datos[i] = p.datos[i];
     }
     delete[] p.datos;
     p.datos = datos;
-    p.cap *= MULT_CRECIMIENTO;
+    p.capacidad *= MULT_CRECIMIENTO;
 }
 
 template <class T> void apilar(pila<T> &p, T dato)
 {
-    if(p.prof== p.cap)
-        aumentar_cap(p);
-    p.datos[p.prof] = dato;
-    p.prof++;
+    if(p.tamano== p.capacidad)
+        ampliar_memoria(p);
+    p.datos[p.tamano] = dato;
+    p.tamano++;
 }
 
 template <class T> void desapilar(pila<T> &p)
 {
     if(es_vacia(p)) throw PilaVaciaUndef();
-    p.prof--;
+    p.tamano--;
 }
 
 template <class T> T cima(pila<T> p)
 {
     if(es_vacia(p)) throw PilaVaciaUndef();
-    return p.datos[p.prof - 1];
+    return p.datos[p.tamano - 1];
 }
 
 template <class T> T cima_y_desapilar(pila<T> &p)
@@ -99,21 +116,21 @@ template <class T> T cima_y_desapilar(pila<T> &p)
     return result;
 }
 
-template <class T> int profundidad(pila<T> p)
+template <class T> int tamanoundidad(pila<T> p)
 {
-    return p.prof;
+    return p.tamano;
 }
 
 template <class T> void liberar(pila<T> &p)
 {
-    p.prof--;
+    p.tamano--;
     if(p.datos) delete[] p.datos;
 }
 
 template <class T> ostream& operator<<(ostream& os, pila<T> p)
 {
     os << "[";
-    for(int i = p.prof - 1; i >= 0; i--)
+    for(int i = p.tamano - 1; i >= 0; i--)
     {
         os << p.datos[i];
         if (i > 0) os << " ";

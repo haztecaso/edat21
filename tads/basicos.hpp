@@ -1,3 +1,12 @@
+/*
+ * TADS Básicos - Útiles para definir nuevos TADS
+ *
+ * Jorge González Gutiérrez
+ * Adrián Lattes Grassi
+ * Fernando Montero Erustes
+ *
+ */
+
 #include <string>
 #include <sstream>
 #include <exception>

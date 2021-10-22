@@ -1,3 +1,12 @@
+/*
+ * Colas - Implementación dinámica
+ *
+ * Jorge González Gutiérrez
+ * Adrián Lattes Grassi
+ * Fernando Montero Erustes
+ *
+ */
+
 #include <string>
 #include <exception>
 
@@ -7,6 +16,8 @@
 
 using namespace std;
 
+// Definición del tipo para las colas
+// Los valores por defecto corresponden con la representación de una cola vacía
 template<class T>
 struct cola {
     nodo_simple<T> *primero = nullptr;
@@ -14,16 +25,7 @@ struct cola {
     int tamano = 0;
 };
 
-template <class T> bool es_vacia(cola<T> c);
-template <class T> void encolar(cola<T> &c, T d);
-template <class T> void desencolar(cola<T> &c);
-template <class T> T primero(cola<T> c);
-template <class T> int tamano(cola<T> c);
-template <class T> std::ostream& operator<<(std::ostream& os, cola<T> c);
-template <class T> std::ostream& operator<<(std::ostream& os, cola<T> *c);
-
-// Excepción que lanzan las operaciones parciales que no están definidas para
-// las pilas vacías
+// Excepción que lanzan las operaciones parciales que no están definidas para las colas vacías
 struct ColaVaciaUndef : public exception
 {
     const char * what () const throw ()
@@ -32,12 +34,46 @@ struct ColaVaciaUndef : public exception
     }
 };
 
-// Implementaciones
+// Determina si una cola es vacía
+template <class T> bool es_vacia(cola<T> c);
+
+// Devuelve el tamaño de una cola
+template <class T> int tamano(cola<T> c);
+
+// Añade un elemento al final de una cola
+template <class T> void encolar(cola<T> &c, T d);
+
+// Elimina el primer elemento de una cola
+// Función parcial: lanza una excepción ColaVaciaUndef si la cola es vacía 
+template <class T> void desencolar(cola<T> &c);
+
+// Devuelve el primer elemento de una cola (sin sacarlo de la cola)
+// Función parcial: lanza una excepción ColaVaciaUndef si la cola es vacía 
+template <class T> T primero(cola<T> c);
+
+// Libera la memoria de una cola
+template <class T> void liberar(cola<T> &c);
+
+// Sobrecarga del operador << para imprimir una cola
+template <class T> std::ostream& operator<<(std::ostream& os, cola<T> c);
+
+// Sobrecarga del operador << para imprimir un puntero a una cola
+template <class T> std::ostream& operator<<(std::ostream& os, cola<T> *c);
+
+/*
+ * IMPLEMENTACIONES
+ */
 
 template <class T> bool es_vacia(cola<T> c)
 {
-    return c.tamano == 0;
+    return tamano(c) == 0;
 }
+
+template <class T> int tamano(cola<T> c)
+{
+    return c.tamano;
+}
+
 
 template <class T> void encolar(cola<T> &c, T d)
 {
@@ -71,9 +107,9 @@ template <class T> T primero(cola<T> c)
     return c.primero->dato;
 }
 
-template <class T> int tamano(cola<T> c)
+template <class T> void liberar(cola<T> &c)
 {
-    return c.tamano;
+    while(!es_vacia(c)) desencolar(c);
 }
 
 template <class T> std::ostream& operator<<(std::ostream& os, cola<T> c)

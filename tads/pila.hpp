@@ -1,5 +1,13 @@
+/*
+ * Pilas - Implementación dinámica
+ *
+ * Jorge González Gutiérrez
+ * Adrián Lattes Grassi
+ * Fernando Montero Erustes
+ *
+ */
+
 #include <string>
-#include <sstream>
 #include <exception>
 
 #include "./basicos.hpp"
@@ -8,23 +16,13 @@
 
 using namespace std;
 
+// Definición del tipo para las pilas
+// Los valores por defecto corresponden con la representación de una pila vacía
 template<class T>
 struct pila {
     nodo_simple<T> *cima = nullptr;
     int tamano = 0;
 };
-
-template <class T> bool es_vacia(pila<T> p);
-template <class T> void apilar(pila<T> &p, T d);
-template <class T> void desapilar(pila<T> &p);
-template <class T> void liberar(pila<T> &p);
-template <class T> T cima(pila<T> p);
-template <class T> int tamano(pila<T> p);
-template <class T> T cima_y_desapilar(pila<T> &p);
-template <class T> std::ostream& operator<<(std::ostream& os, pila<T> p);
-template <class T> std::ostream& operator<<(std::ostream& os, pila<T> *p);
-
-// Implementaciones
 
 struct PilaVaciaUndef : public exception
 {
@@ -34,9 +32,49 @@ struct PilaVaciaUndef : public exception
     }
 };
 
+
+// Determina si una pila es vacía
+template <class T> bool es_vacia(pila<T> p);
+
+// Devuelve el tamaño de una pila
+template <class T> int tamano(pila<T> p);
+
+// Añade un elemento en la cima de una pila
+template <class T> void apilar(pila<T> &p, T d);
+
+// Elimina la cima de una pila
+// Función parcial: lanza una excepción PilaVaciaUndef si la pila es vacía 
+template <class T> void desapilar(pila<T> &p);
+
+// Devuelve la cima de una pila (sin sacarla de la pila)
+// Función parcial: lanza una excepción PilaVaciaUndef si la pila es vacía 
+template <class T> T cima(pila<T> p);
+
+// Devuelve y elimina la cima de una pila
+// Función parcial: lanza una excepción PilaVaciaUndef si la pila es vacía 
+template <class T> T cima_y_desapilar(pila<T> &p);
+
+// Libera la memoria de una pila
+template <class T> void liberar(pila<T> &p);
+
+// Sobrecarga del operador << para imprimir una pila
+template <class T> std::ostream& operator<<(std::ostream& os, pila<T> p);
+
+// Sobrecarga del operador << para imprimir un puntero a una pila
+template <class T> std::ostream& operator<<(std::ostream& os, pila<T> *p);
+
+/*
+ * IMPLEMENTACIONES
+ */
+
 template <class T> bool es_vacia(pila<T> p)
 {
-    return p.tamano == 0;
+    return tamano(p) == 0;
+}
+
+template <class T> int tamano(pila<T> p)
+{
+    return p.tamano;
 }
 
 template <class T> void apilar(pila<T> &p, T d)
@@ -56,20 +94,10 @@ template <class T> void desapilar(pila<T> &p)
     p.tamano--;
 }
 
-template <class T> void liberar(pila<T> &p)
-{
-    while(!es_vacia(p)) desapilar(p);
-}
-
 template <class T> T cima(pila<T> p)
 {
     if(es_vacia(p)) throw PilaVaciaUndef();
     return p.cima->dato;
-}
-
-template <class T> int tamano(pila<T> p)
-{
-    return p.tamano;
 }
 
 template <class T> T cima_y_desapilar(pila<T> &p)
@@ -78,6 +106,11 @@ template <class T> T cima_y_desapilar(pila<T> &p)
     T result = cima(p);
     desapilar(p);
     return result;
+}
+
+template <class T> void liberar(pila<T> &p)
+{
+    while(!es_vacia(p)) desapilar(p);
 }
 
 template <class T> std::ostream& operator<<(std::ostream& os, pila<T> p)
