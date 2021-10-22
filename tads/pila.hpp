@@ -10,7 +10,7 @@ using namespace std;
 
 template<class T>
 struct pila {
-    nodo_simple<T> *nodo = nullptr;
+    nodo_simple<T> *cima = nullptr;
     int tamano = 0;
 };
 
@@ -41,46 +41,30 @@ template <class T> bool es_vacia(pila<T> p)
 
 template <class T> void apilar(pila<T> &p, T d)
 {
-    if (es_vacia(p))
-    {
-        p = *(new pila<T>);
-        p.nodo = new nodo_simple<T>;
-    }
-    else
-    {
-        nodo_simple<T> *nodo_nuevo = new nodo_simple<T>;
-        nodo_nuevo->siguiente = p.nodo;
-        p.nodo = nodo_nuevo;
-    }
-        p.nodo->dato = d;
-        p.tamano++;
+    // La función crear_nodo_simple está definida en el fichero ./basicos.hpp
+    nodo_simple<T> *nodo_nuevo = crear_nodo_simple(d, p.cima);
+    p.cima = nodo_nuevo;
+    p.tamano++;
 }
 
 template <class T> void desapilar(pila<T> &p)
 {
-    if(!es_vacia(p))
-    {
-        nodo_simple<T> *nodo_antiguo = p.nodo;
-        p.nodo = p.nodo->siguiente;
-        delete nodo_antiguo;
-        p.tamano--;
-    }
-    else
-        throw PilaVaciaUndef();
+    if(es_vacia(p)) throw PilaVaciaUndef();
+    nodo_simple<T> *nodo_antiguo = p.cima;
+    p.cima = p.cima->siguiente;
+    delete nodo_antiguo;
+    p.tamano--;
 }
 
 template <class T> void liberar(pila<T> &p)
 {
-    while(!es_vacia(p))
-        desapilar(p);
+    while(!es_vacia(p)) desapilar(p);
 }
 
 template <class T> T cima(pila<T> p)
 {
-    if(!es_vacia(p))
-        return p.nodo->dato;
-    else
-        throw PilaVaciaUndef();
+    if(es_vacia(p)) throw PilaVaciaUndef();
+    return p.cima->dato;
 }
 
 template <class T> int tamano(pila<T> p)
@@ -90,6 +74,7 @@ template <class T> int tamano(pila<T> p)
 
 template <class T> T cima_y_desapilar(pila<T> &p)
 {
+    if(es_vacia(p)) throw PilaVaciaUndef();
     T result = cima(p);
     desapilar(p);
     return result;
@@ -97,7 +82,7 @@ template <class T> T cima_y_desapilar(pila<T> &p)
 
 template <class T> std::ostream& operator<<(std::ostream& os, pila<T> p)
 {
-    nodo_simple<T> *nodo_actual = p.nodo;
+    nodo_simple<T> *nodo_actual = p.cima;
     os << "[";
     while (nodo_actual != nullptr)
     {

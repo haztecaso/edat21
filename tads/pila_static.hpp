@@ -14,7 +14,6 @@ struct pila {
     T *datos = new T[CAP_INIC];
 };
 
-
 // No hemos definido la constante pila_vacia ya que hay que alocar memoria para
 // definir las pilas vacias.
 
@@ -82,22 +81,19 @@ template <class T> void apilar(pila<T> &p, T dato)
 
 template <class T> void desapilar(pila<T> &p)
 {
-    if(!es_vacia(p))
-        p.prof--;
-    else
-        throw PilaVaciaUndef();
+    if(es_vacia(p)) throw PilaVaciaUndef();
+    p.prof--;
 }
 
 template <class T> T cima(pila<T> p)
 {
-    if(!es_vacia(p))
-        return p.datos[p.prof- 1];
-    else
-        throw PilaVaciaUndef();
+    if(es_vacia(p)) throw PilaVaciaUndef();
+    return p.datos[p.prof - 1];
 }
 
 template <class T> T cima_y_desapilar(pila<T> &p)
 {
+    if(es_vacia(p)) throw PilaVaciaUndef();
     T result = cima(p);
     desapilar(p);
     return result;
