@@ -1,5 +1,5 @@
 #include <iostream>
-#include "cola.hpp"
+#include "cola_static.hpp"
 
 using namespace std;
 
@@ -10,7 +10,7 @@ template<class T> void imprimir_desencolar(cola<T> &cola);
 
 int main(){
     cout << "cola<char> cola = *(new cola<char>); " << endl;
-    cola<char> c= *(new cola<char>);
+    cola<char> c;
     imprimir_cola(c);
 
     imprimir_encolar(c, 'A');

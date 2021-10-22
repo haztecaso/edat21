@@ -1,5 +1,4 @@
 #include <string>
-#include <sstream>
 #include <exception>
 
 #include "./basicos.hpp"
@@ -16,13 +15,15 @@ struct cola {
 };
 
 template <class T> bool es_vacia(cola<T> c);
-template <class T> void pedir_vez(cola<T> &c, T d);
-template <class T> void avanzar(cola<T> &c);
+template <class T> void encolar(cola<T> &c, T d);
+template <class T> void desencolar(cola<T> &c);
 template <class T> T primero(cola<T> c);
 template <class T> int tamano(cola<T> c);
 template <class T> std::ostream& operator<<(std::ostream& os, cola<T> c);
 template <class T> std::ostream& operator<<(std::ostream& os, cola<T> *c);
 
+// Excepción que lanzan las operaciones parciales que no están definidas para
+// las pilas vacías
 struct ColaVaciaUndef : public exception
 {
     const char * what () const throw ()
@@ -38,13 +39,12 @@ template <class T> bool es_vacia(cola<T> c)
     return c.tamano == 0;
 }
 
-template <class T> void pedir_vez(cola<T> &c, T d)
+template <class T> void encolar(cola<T> &c, T d)
 {
     if (es_vacia(c))
     {
-        c = *(new cola<T>);
-        c.primero = new nodo_simple<T>;
-        c.ultimo = c.primero;
+        c.ultimo = new nodo_simple<T>;
+        c.primero = c.ultimo;
     }
     else
     {
@@ -52,29 +52,23 @@ template <class T> void pedir_vez(cola<T> &c, T d)
         c.ultimo->siguiente = nodo_nuevo;
         c.ultimo = nodo_nuevo;
     }
-        c.ultimo->dato = d;
-        c.tamano++;
+    c.ultimo->dato = d;
+    c.tamano++;
 }
 
-template <class T> void avanzar(cola<T> &c)
+template <class T> void desencolar(cola<T> &c)
 {
-    if(!es_vacia(c))
-    {
-        nodo_simple<T> *nodo_antiguo = c.primero;
-        c.primero = c.primero->siguiente;
-        delete nodo_antiguo;
-        c.tamano--;
-    }
-    else
-        throw ColaVaciaUndef();
+    if(es_vacia(c)) throw ColaVaciaUndef();
+    nodo_simple<T> *nodo_antiguo = c.primero;
+    c.primero = c.primero->siguiente;
+    delete nodo_antiguo;
+    c.tamano--;
 }
 
 template <class T> T primero(cola<T> c)
 {
-    if(!es_vacia(c))
-        return c.primero->dato;
-    else
-        throw ColaVaciaUndef();
+    if(es_vacia(c)) throw ColaVaciaUndef();
+    return c.primero->dato;
 }
 
 template <class T> int tamano(cola<T> c)
