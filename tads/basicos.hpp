@@ -10,8 +10,10 @@
 #include <string>
 #include <sstream>
 #include <exception>
-
 #pragma once
+
+const int CAP_INIC = 16;
+const int MULT_CRECIMIENTO = 2;
 
 using namespace std;
 

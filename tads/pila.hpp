@@ -9,9 +9,7 @@
 
 #include <string>
 #include <exception>
-
-#include "./basicos.hpp"
-
+#include "basicos.hpp"
 #pragma once
 
 using namespace std;

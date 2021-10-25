@@ -10,19 +10,18 @@
 #include <string>
 #include <sstream>
 #include <exception>
+#include "basicos.hpp"
+#pragma once
 
 using namespace std;
-
-const int capacidad_INIC = 2;
-const int MULT_CRECIMIENTO = 2;
 
 // Definición del tipo para las pilas
 // Los valores por defecto corresponden con la representación de una pila vacía
 template<class T>
 struct pila {
-    int capacidad = capacidad_INIC;
+    int capacidad = CAP_INIC;
     int tamano = 0;
-    T *datos = new T[capacidad_INIC];
+    T *datos = new T[CAP_INIC];
 };
 
 // Excepción que lanzan las operaciones parciales que no están definidas para las colas vacías

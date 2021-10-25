@@ -7,15 +7,12 @@
  *
  */
 
-#include<iostream>
+#include <iostream>
 #include <exception>
-
+#include "basicos.hpp"
 #pragma once
 
 using namespace std;
-
-const int CAP_INIC = 16;
-const int MULT_CRECIMIENTO = 2;
 
 // Definición del tipo para las colas
 // Representación de las colas mediante arrays circulares.
@@ -84,13 +81,13 @@ template<class T> int tamano(cola<T> c)
 
 template<class T> void ampliar_memoria(cola<T> &c)
 {
-    T *datos_nuevos = new T[c.capacidad * 2];
+    T *datos_nuevos = new T[c.capacidad * MULT_CRECIMIENTO];
     for(int i = 0; i < c.tamano ; i++){
        datos_nuevos[i] = c.datos[(c.primero+i) % c.capacidad];
     }
     c.primero = 0;
     c.ultimo = c.tamano - 1;
-    c.capacidad *= 2;
+    c.capacidad *= MULT_CRECIMIENTO;
     delete[] c.datos;
     c.datos = datos_nuevos;
 }
@@ -119,6 +116,10 @@ template<class T> T primero(cola<T> c){
 template<class T> void liberar(cola<T> &c)
 {
     delete[] c.datos;
+    c.tamano = 0;
+    c.primero = 1;
+    c.ultimo = 0;
+    c.capacidad = 0;
 }
 
 template<class T> std::ostream& operator<<(std::ostream& os, cola<T> c)
