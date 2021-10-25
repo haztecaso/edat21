@@ -7,9 +7,9 @@
  *
  */
 
+#pragma once
 #include <sstream>
 #include "basicos.hpp"
-#pragma once
 
 using namespace std;
 

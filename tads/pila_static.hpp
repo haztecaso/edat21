@@ -7,10 +7,9 @@
  *
  */
 
-#include <sstream>
-#include <exception>
-#include "basicos.hpp"
 #pragma once
+#include <sstream>
+#include "basicos.hpp"
 
 using namespace std;
 
