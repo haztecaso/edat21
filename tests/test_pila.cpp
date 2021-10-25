@@ -16,7 +16,7 @@ void test_liberar(pila<el> &p);
 int main(){
     srand(time(NULL)); // initialize random seed
     pila<el> p;
-    for(int i; i < N_TESTS; i++)
+    for(int i = 0; i < N_TESTS; i++)
     {
         if (rand() % 100 > 50)
             test_apilar(p);
@@ -44,7 +44,7 @@ void test_desapilar(pila<el> &p)
         try {
             desapilar(p);
         }
-        catch(VaciaUndef)
+        catch(VaciaUndef const&)
         {
             error = true;
         }

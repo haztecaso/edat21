@@ -17,7 +17,7 @@ int main(){
     srand(time(NULL)); // initialize random seed
     cola<char> c;
 
-    for(int i; i < N_TESTS; i++)
+    for(int i = 0; i < N_TESTS; i++)
     {
         if (rand() % 100 > 50)
             test_encolar(c);
@@ -46,7 +46,7 @@ void test_desencolar(cola<el> &c)
         {
             desencolar(c);
         }
-        catch(VaciaUndef)
+        catch(VaciaUndef const&)
         {
             error = true;
         }

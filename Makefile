@@ -1,5 +1,5 @@
 CC = g++
-CCFLAGS = -O1
+CCFLAGS = -O1 -Wall -Wextra -Wshadow -Wdouble-promotion -Werror
 OUT = bin
 TADS = tads
 TESTS = tests

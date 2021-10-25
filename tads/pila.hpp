@@ -110,7 +110,7 @@ template <class T> ostream& operator<<(ostream& os, pila<T> p)
         os << nodo_actual->dato;
         if(nodo_actual->siguiente != nullptr)
             os << " ";
-            nodo_actual = nodo_actual->siguiente;
+        nodo_actual = nodo_actual->siguiente;
     }
     os << "]";
     return os;

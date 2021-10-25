@@ -71,14 +71,14 @@ void require_params(mem m, int n)
         throw "La operación requiere " + to_string(n) + " parámetros";
 }
 
-void ejecutar_op(el (*fn)(el), mem &m, reg r)
+void ejecutar_op(el (*fn)(el), mem &m)
 {
     require_params(m, 1);
     el x = cima_y_desapilar(m);
     apilar(m, fn(x));
 }
 
-void ejecutar_op(el (*fn)(el, el), mem &m, reg r)
+void ejecutar_op(el (*fn)(el, el), mem &m)
 {
     require_params(m, 2);
     el b = cima_y_desapilar(m);
@@ -192,31 +192,31 @@ void casos_token(token t, mem &m, reg r)
             apilar(m, rd1);
             break;
         case op_suma:
-            ejecutar_op([](el a, el b) { return a + b; }, m, r);
+            ejecutar_op([](el a, el b) { return a + b; }, m);
             break;
         case op_resta:
-            ejecutar_op([](el a, el b) { return a - b; }, m, r);
+            ejecutar_op([](el a, el b) { return a - b; }, m);
             break;
         case op_mult:
-            ejecutar_op([](el a, el b) { return a * b; }, m, r);
+            ejecutar_op([](el a, el b) { return a * b; }, m);
             break;
         case op_div:
-            ejecutar_op([](el a, el b) { return a / b; }, m, r);
+            ejecutar_op([](el a, el b) { return a / b; }, m);
             break;
         case op_pot:
-            ejecutar_op(powl, m, r);
+            ejecutar_op(powl, m);
             break;
         case op_sen:
-            ejecutar_op(sin, m, r);
+            ejecutar_op(sin, m);
             break;
         case op_cos:
-            ejecutar_op(cos, m, r);
+            ejecutar_op(cos, m);
             break;
         case op_tan:
-            ejecutar_op(tan, m, r);
+            ejecutar_op(tan, m);
             break;
         case op_gamma:
-            ejecutar_op(tgamma, m, r);
+            ejecutar_op(tgamma, m);
             break;
         case op_read: // indice read
             require_params(m, 1);
@@ -247,7 +247,7 @@ void ejecutar(mem &m, reg r, stringstream &source)
             el valor = stold(word);
             apilar(m, valor);
         }
-        catch (const invalid_argument)
+        catch (invalid_argument const&)
         {
             try{
                 token t = parse_token(word);
@@ -256,7 +256,7 @@ void ejecutar(mem &m, reg r, stringstream &source)
                     casos_token(t, m, r); 
                     cout << flush;
                 }
-                catch (VaciaUndef)
+                catch (VaciaUndef const&)
                 {
                     cout << "ERROR: memoria vacía." << endl;
                 }
