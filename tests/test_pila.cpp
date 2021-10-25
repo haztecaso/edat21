@@ -1,8 +1,8 @@
 #include <iostream>
 #include <stdlib.h>
 #include <string>
-#include <cassert>
 #include "pila.hpp"
+#include "utils.hpp"
 
 using namespace std;
 
@@ -31,13 +31,13 @@ int main(){
             test_desapilar(p);
         }
     }
-    assert(n == n_apilados+n_desapilados+n_errores);
+    assert_eq(n, n_apilados+n_desapilados+n_errores);
     int t = tamano(p);
-    assert(t == n_apilados-n_desapilados);
+    assert_eq(t, n_apilados-n_desapilados);
     cout << p << endl;
     liberar(p);
     t = tamano(p);
-    assert(t == 0);
+    assert_eq(t, 0);
     return 0;
 }
 
@@ -47,7 +47,7 @@ void test_apilar(pila<el> &p)
     el e = (el) 97 + rand() % 26;
     apilar(p, e);
     const int tamano_final = tamano(p);
-    assert(tamano_final == tamano_inicial + 1);
+    assert_eq(tamano_final, tamano_inicial + 1);
     n_apilados++;
 }
 
@@ -64,7 +64,7 @@ void test_desapilar(pila<el> &p)
         {
             error = true;
         }
-        assert(error);
+        assert_true(error);
         n_errores++;
     }
     else
@@ -72,7 +72,7 @@ void test_desapilar(pila<el> &p)
         const int tamano_inicial = tamano(p);
         desapilar(p);
         const int tamano_final = tamano(p);
-        assert(tamano_final == tamano_inicial - 1);
+        assert_eq(tamano_final, tamano_inicial - 1);
         n_desapilados++;
     }
 }
