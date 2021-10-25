@@ -1,5 +1,9 @@
-#include "cola.hpp"
 #include "test_utils.hpp"
+#ifndef STATIC
+    #include "cola.hpp"
+#else
+    #include "cola_static.hpp"
+#endif
 
 using namespace std;
 

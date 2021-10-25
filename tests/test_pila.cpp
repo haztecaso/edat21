@@ -1,5 +1,9 @@
-#include "pila.hpp"
 #include "test_utils.hpp"
+#ifndef STATIC
+    #include "pila.hpp"
+#else
+    #include "pila_static.hpp"
+#endif
 
 using namespace std;
 

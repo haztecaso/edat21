@@ -5,7 +5,7 @@
 #define assert_eq(e1, e2) _assert_eq(#e1, #e2, e1, e2)
 #define assert_neq(e1, e2) _assert_neq(#e1, #e2, e1, e2)
 
-#define N_TESTS 1000
+#define N_TESTS 10000
 
 using namespace std;
 
