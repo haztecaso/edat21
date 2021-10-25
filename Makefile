@@ -1,25 +1,24 @@
 CC = g++
 CCFLAGS = -O1 -Wall -Wextra -Wshadow -Wdouble-promotion -Werror
 OUT = bin
-TADS = tads
-TESTS = tests
+
+TESTS = test_pila test_pila_static test_cola test_cola_static
+PROGRAMAS = calculadora parentesis_equilibrados pilas_de_pilas
 
 build: tests programas
 
-_PROGRAMAS = parentesis_equilibrados pilas_de_pilas calculadora
-programas: mkdirs $(patsubst %,$(OUT)/%,$(_PROGRAMAS))
-$(OUT)/%: programas/%.cpp $(TADS)/*.hpp
-	$(CC) $(CCFLAGS) $< -o $@ -I $(TADS)
+programas: mkdirs $(patsubst %,$(OUT)/%,$(PROGRAMAS))
+$(OUT)/%: programas/%.cpp tads/*.hpp
+	$(CC) $(CCFLAGS) $< -I tads -o $@
 
-_TESTS = test_pila test_pila_static test_cola test_cola_static
-tests: mkdirs $(patsubst %,$(OUT)/%,$(_TESTS))
-$(OUT)/test_%: $(TESTS)/test_%.cpp $(TESTS)/test_utils.hpp $(TADS)/%.hpp $(TADS)/basicos.hpp
-	$(CC) $(CCFLAGS) $< -o $@ -I$(TADS)
-$(OUT)/test_%_static: $(TESTS)/test_%.cpp $(TESTS)/test_utils.hpp $(TADS)/%_static.hpp $(TADS)/basicos.hpp
-	$(CC) $(CCFLAGS) -D STATIC $< -o $@ -I$(TADS)
+tests: mkdirs $(patsubst %,$(OUT)/%,$(TESTS))
+$(OUT)/test_%: tests/test_%.cpp tests/test_utils.hpp tads/%.hpp tads/basicos.hpp
+	$(CC) $(CCFLAGS) $< -I tads -o $@
+$(OUT)/test_%_static: tests/test_%.cpp tests/test_utils.hpp tads/%_static.hpp tads/basicos.hpp
+	$(CC) $(CCFLAGS) -D STATIC $< -I tads -o $@
 
 .PHONY: test test_%
-test: $(_TESTS)
+test: $(TESTS)
 test_%: $(OUT)/test_%
 	./$<
 
