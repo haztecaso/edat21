@@ -7,7 +7,7 @@
  *
  */
 
-#include <string>
+#include <sstream>
 #include <exception>
 #include "basicos.hpp"
 #pragma once
@@ -53,10 +53,10 @@ template <class T> T primero(cola<T> c);
 template <class T> void liberar(cola<T> &c);
 
 // Sobrecarga del operador << para imprimir una cola
-template <class T> std::ostream& operator<<(std::ostream& os, cola<T> c);
+template <class T> ostream& operator<<(ostream& os, cola<T> c);
 
 // Sobrecarga del operador << para imprimir un puntero a una cola
-template <class T> std::ostream& operator<<(std::ostream& os, cola<T> *c);
+template <class T> ostream& operator<<(ostream& os, cola<T> *c);
 
 /*
  * IMPLEMENTACIONES
@@ -109,7 +109,7 @@ template <class T> void liberar(cola<T> &c)
     while(!es_vacia(c)) desencolar(c);
 }
 
-template <class T> std::ostream& operator<<(std::ostream& os, cola<T> c)
+template <class T> ostream& operator<<(ostream& os, cola<T> c)
 {
     os << "[";
     nodo_simple<T> *nodo_actual = c.primero;
@@ -124,7 +124,7 @@ template <class T> std::ostream& operator<<(std::ostream& os, cola<T> c)
     return os;
 }
 
-template <class T> std::ostream& operator<<(std::ostream& os, cola<T> *c)
+template <class T> ostream& operator<<(ostream& os, cola<T> *c)
 {
     os << "*" << *c;
     return os;

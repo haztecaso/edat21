@@ -7,23 +7,22 @@
  *
  */
 
-#include <string>
-#include <sstream>
-#include <exception>
 #pragma once
-
-const int CAP_INIC = 16;
-const int MULT_CRECIMIENTO = 2;
 
 using namespace std;
 
+// Constantes
+const int CAP_INIC = 16;
+const int MULT_CRECIMIENTO = 2;
 
+// Nodos simples
 template<class T>
 struct nodo_simple {
     T dato;
     nodo_simple<T> * siguiente = nullptr;
 };
 
+// Nodos dobles (enlazados)
 template<class T>
 struct nodo_doble {
     T dato;
@@ -38,7 +37,9 @@ template <class T> nodo_simple<T> * crear_nodo_simple(T d, nodo_simple<T> * s);
 // nodo siguiente (inicializado con nullptr)
 template <class T> nodo_simple<T> * crear_nodo_simple(T d);
 
-//IMPLEMENTACIONES
+/*
+ * IMPLEMENTACIONES
+ */
 
 template <class T> nodo_simple<T> * crear_nodo_simple(T d, nodo_simple<T> * s)
 {

@@ -7,7 +7,7 @@
  *
  */
 
-#include <iostream>
+#include <sstream>
 #include <exception>
 #include "basicos.hpp"
 #pragma once
@@ -122,18 +122,18 @@ template<class T> void liberar(cola<T> &c)
     c.capacidad = 0;
 }
 
-template<class T> std::ostream& operator<<(std::ostream& os, cola<T> c)
+template<class T> ostream& operator<<(ostream& os, cola<T> c)
 {
     os << "[";
     for(int i = 0; i < c.tamano ; i++){
        os << c.datos[(c.primero+i) % c.capacidad];
-       if (i < c.tamano - 1) cout << " ";
+       if (i < c.tamano - 1) os << " ";
        }
     os << "]";
     return os;
 }
 
-template<class T> std::ostream& operator<<(std::ostream& os, cola<T> *c)
+template<class T> ostream& operator<<(ostream& os, cola<T> *c)
 {
     os << "*" << c;
     return os;
