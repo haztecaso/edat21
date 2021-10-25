@@ -1,7 +1,0 @@
-e pi ^
-pi e ^
-- =
-
-pi 3 / cos
-pi 3 / sen 
-- =

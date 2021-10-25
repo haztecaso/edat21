@@ -1,3 +1,10 @@
+/*
+ * CALCULADORA RPN
+ *
+ * Adrián Lattes Grassi
+ *
+ */
+
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -249,7 +256,7 @@ void ejecutar(mem &m, reg r, stringstream &source)
                     casos_token(t, m, r); 
                     cout << flush;
                 }
-                catch (PilaVaciaUndef)
+                catch (VaciaUndef)
                 {
                     cout << "ERROR: memoria vacía." << endl;
                 }
