@@ -1,30 +1,26 @@
-#include <iostream>
 #include "cola_static.hpp"
 #include "test_utils.hpp"
 
 using namespace std;
 
 typedef char el;
+
 void test_encolar(cola<el> &c);
 void test_desencolar(cola<el> &c);
+void test_liberar(cola<el> &c);
 
 int main(){
-    srand (time(NULL)); // initialize random seed
+    srand(time(NULL)); // initialize random seed
     cola<char> c;
 
     for(int i; i < N_TESTS; i++)
     {
         if (rand() % 100 > 50)
-        {
             test_encolar(c);
-        }
         else
-        {
             test_desencolar(c);
-        }
     }
-    liberar(c);
-    assert_eq(tamano(c), 0);
+    test_liberar(c);
     return 0;
 }
 
@@ -59,4 +55,10 @@ void test_desencolar(cola<el> &c)
         const int tamano_final = tamano(c);
         assert_eq(tamano_final, tamano_inicial - 1);
     }
+}
+
+void test_liberar(cola<el> &c)
+{
+    liberar(c);
+    assert_eq(tamano(c), 0);
 }

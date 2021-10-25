@@ -1,4 +1,3 @@
-#include <iostream>
 #include "pila.hpp"
 #include "test_utils.hpp"
 
@@ -8,23 +7,19 @@ typedef char el;
 
 void test_apilar(pila<el> &p);
 void test_desapilar(pila<el> &p);
+void test_liberar(pila<el> &p);
 
 int main(){
-    srand (time(NULL)); // initialize random seed
+    srand(time(NULL)); // initialize random seed
     pila<el> p;
     for(int i; i < N_TESTS; i++)
     {
         if (rand() % 100 > 50)
-        {
             test_apilar(p);
-        }
         else
-        {
             test_desapilar(p);
-        }
     }
-    liberar(p);
-    assert_eq(tamano(p), 0);
+    test_liberar(p);
     return 0;
 }
 
@@ -42,8 +37,7 @@ void test_desapilar(pila<el> &p)
     if(es_vacia(p))
     {
         bool error = false;
-        try
-        {
+        try {
             desapilar(p);
         }
         catch(PilaVaciaUndef)
@@ -59,4 +53,10 @@ void test_desapilar(pila<el> &p)
         const int tamano_final = tamano(p);
         assert_eq(tamano_final, tamano_inicial - 1);
     }
+}
+
+void test_liberar(pila<el> &p)
+{
+    liberar(p);
+    assert_eq(tamano(p), 0);
 }
