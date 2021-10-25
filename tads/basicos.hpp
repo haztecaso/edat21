@@ -32,6 +32,9 @@ struct nodo_doble {
 // Función para crear e inicializar un nuevo nodo simple dado un dato y un nodo siguiente.
 template <class T> nodo_simple<T> * crear_nodo_simple(T d, nodo_simple<T> * s);
 
+// Función para crear e inicializar un nuevo nodo simple dado un dato y sin un
+// nodo siguiente (inicializado con nullptr)
+template <class T> nodo_simple<T> * crear_nodo_simple(T d);
 
 //IMPLEMENTACIONES
 
@@ -40,5 +43,12 @@ template <class T> nodo_simple<T> * crear_nodo_simple(T d, nodo_simple<T> * s)
     nodo_simple<T> *nodo = new nodo_simple<T>;
     nodo->dato = d;
     nodo->siguiente= s;
+    return nodo;
+}
+
+template <class T> nodo_simple<T> * crear_nodo_simple(T d)
+{
+    nodo_simple<T> *nodo = new nodo_simple<T>;
+    nodo->dato = d;
     return nodo;
 }

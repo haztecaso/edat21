@@ -74,21 +74,19 @@ template <class T> int tamano(cola<T> c)
     return c.tamano;
 }
 
-
+//TODO: Simplificar esta función. Usar función crear_nodo_simple.
 template <class T> void encolar(cola<T> &c, T d)
 {
+    nodo_simple<T> *nodo = crear_nodo_simple(d);
     if (es_vacia(c))
     {
-        c.ultimo = new nodo_simple<T>;
-        c.primero = c.ultimo;
+        c.primero = nodo;
     }
     else
     {
-        nodo_simple<T> *nodo_nuevo = new nodo_simple<T>;
-        c.ultimo->siguiente = nodo_nuevo;
-        c.ultimo = nodo_nuevo;
+        c.ultimo->siguiente = nodo;
     }
-    c.ultimo->dato = d;
+    c.ultimo = nodo;
     c.tamano++;
 }
 
@@ -97,6 +95,7 @@ template <class T> void desencolar(cola<T> &c)
     if(es_vacia(c)) throw ColaVaciaUndef();
     nodo_simple<T> *nodo_antiguo = c.primero;
     c.primero = c.primero->siguiente;
+    if (c.primero == nullptr) c.ultimo = nullptr;
     delete nodo_antiguo;
     c.tamano--;
 }

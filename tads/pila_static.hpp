@@ -37,6 +37,9 @@ struct PilaVaciaUndef : public exception
 // Determina si una pila está vacía
 template<class T> bool es_vacia(pila<T> p);
 
+// Devuelve el tamaño de una pila
+template <class T> int tamano(pila<T> p);
+
 // Duplica el tamaño del array de datos de una pila
 template <class T> void ampliar_memoria(pila<T> &p);
 
@@ -55,9 +58,6 @@ template <class T> T cima(pila<T> p);
 // Función parcial: lanza una excepción PilaVaciaUndef si la pila es vacía 
 template <class T> T cima_y_desapilar(pila<T> &p);
 
-// Devuelve el tamaño de una pila
-template <class T> int tamanoundidad(pila<T> p);
-
 // Libera la memoria de una pila
 template <class T> void liberar(pila<T> &p);
 
@@ -73,7 +73,7 @@ template <class T> ostream& operator<<(ostream& os, pila<T> *p);
 
 template <class T> bool es_vacia(pila<T> p)
 {
-    return p.tamano== 0;
+    return tamano(p) == 0;
 }
 
 template <class T> void ampliar_memoria(pila<T> &p)
@@ -116,15 +116,16 @@ template <class T> T cima_y_desapilar(pila<T> &p)
     return result;
 }
 
-template <class T> int tamanoundidad(pila<T> p)
+template <class T> int tamano(pila<T> p)
 {
     return p.tamano;
 }
 
 template <class T> void liberar(pila<T> &p)
 {
-    p.tamano--;
     if(p.datos) delete[] p.datos;
+    pila<T> nueva;
+    p = nueva;;
 }
 
 template <class T> ostream& operator<<(ostream& os, pila<T> p)

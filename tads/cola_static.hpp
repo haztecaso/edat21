@@ -123,9 +123,12 @@ template<class T> void liberar(cola<T> &c)
 
 template<class T> std::ostream& operator<<(std::ostream& os, cola<T> c)
 {
+    os << "[";
     for(int i = 0; i < c.tamano ; i++){
-       os << c.datos[(c.primero+i) % c.capacidad] << " ";
+       os << c.datos[(c.primero+i) % c.capacidad];
+       if (i < c.tamano - 1) cout << " ";
        }
+    os << "]";
     return os;
 }
 
