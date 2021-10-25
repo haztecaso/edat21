@@ -1,6 +1,4 @@
 #include <iostream>
-#include <stdlib.h>
-#include <string>
 #include "pila_static.hpp"
 #include "utils.hpp"
 
@@ -8,20 +6,14 @@ using namespace std;
 
 typedef char el;
 
-int n_apilados, n_desapilados, n_errores = 0;
-
 void test_apilar(pila<el> &p);
 void test_desapilar(pila<el> &p);
 
 int main(){
     srand (time(NULL)); // initialize random seed
     pila<el> p;
-    int n = rand() % 1024 + 1024;
-    n_apilados = 0;
-    n_desapilados = 0;
-    for(int i; i < n; i++)
+    for(int i; i < N_TESTS; i++)
     {
-        
         if (rand() % 100 > 50)
         {
             test_apilar(p);
@@ -31,13 +23,8 @@ int main(){
             test_desapilar(p);
         }
     }
-    assert_eq(n, n_apilados+n_desapilados+n_errores);
-    int t = tamano(p);
-    assert_eq(t, n_apilados-n_desapilados);
-    cout << p << endl;
     liberar(p);
-    t = tamano(p);
-    assert_eq(t, 0);
+    assert_eq(tamano(p), 0);
     return 0;
 }
 
@@ -48,7 +35,6 @@ void test_apilar(pila<el> &p)
     apilar(p, e);
     const int tamano_final = tamano(p);
     assert_eq(tamano_final, tamano_inicial + 1);
-    n_apilados++;
 }
 
 void test_desapilar(pila<el> &p)
@@ -65,7 +51,6 @@ void test_desapilar(pila<el> &p)
             error = true;
         }
         assert_true(error);
-        n_errores++;
     }
     else
     {
@@ -73,6 +58,5 @@ void test_desapilar(pila<el> &p)
         desapilar(p);
         const int tamano_final = tamano(p);
         assert_eq(tamano_final, tamano_inicial - 1);
-        n_desapilados++;
     }
 }
