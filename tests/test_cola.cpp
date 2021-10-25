@@ -46,7 +46,7 @@ void test_desencolar(cola<el> &c)
         {
             desencolar(c);
         }
-        catch(ColaVaciaUndef)
+        catch(VaciaUndef)
         {
             error = true;
         }

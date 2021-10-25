@@ -23,15 +23,6 @@ struct pila {
     T *datos = new T[CAP_INIC];
 };
 
-// Excepción que lanzan las operaciones parciales que no están definidas para las colas vacías
-struct PilaVaciaUndef : public exception
-{
-    const char * what () const throw ()
-    {
-        return "Operación no definida para las pilas vacías";
-    }
-};
-
 // Determina si una pila está vacía
 template<class T> bool es_vacia(pila<T> p);
 
@@ -45,15 +36,15 @@ template <class T> void ampliar_memoria(pila<T> &p);
 template<class T> void apilar(pila<T> &p, T dato);
 
 // Elimina la cima de una pila
-// Función parcial: lanza una excepción PilaVaciaUndef si la pila es vacía 
+// Función parcial: lanza una excepción VaciaUndef si la pila es vacía 
 template<class T> void desapilar(pila<T> &p);
 
 // Devuelve la cima de una pila (sin sacarla de la pila)
-// Función parcial: lanza una excepción PilaVaciaUndef si la pila es vacía 
+// Función parcial: lanza una excepción VaciaUndef si la pila es vacía 
 template <class T> T cima(pila<T> p);
 
 // Devuelve y elimina la cima de una pila
-// Función parcial: lanza una excepción PilaVaciaUndef si la pila es vacía 
+// Función parcial: lanza una excepción VaciaUndef si la pila es vacía 
 template <class T> T cima_y_desapilar(pila<T> &p);
 
 // Libera la memoria de una pila
@@ -96,19 +87,19 @@ template <class T> void apilar(pila<T> &p, T dato)
 
 template <class T> void desapilar(pila<T> &p)
 {
-    if(es_vacia(p)) throw PilaVaciaUndef();
+    if(es_vacia(p)) throw VaciaUndef();
     p.tamano--;
 }
 
 template <class T> T cima(pila<T> p)
 {
-    if(es_vacia(p)) throw PilaVaciaUndef();
+    if(es_vacia(p)) throw VaciaUndef();
     return p.datos[p.tamano - 1];
 }
 
 template <class T> T cima_y_desapilar(pila<T> &p)
 {
-    if(es_vacia(p)) throw PilaVaciaUndef();
+    if(es_vacia(p)) throw VaciaUndef();
     T result = cima(p);
     desapilar(p);
     return result;

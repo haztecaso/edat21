@@ -44,7 +44,7 @@ void test_desapilar(pila<el> &p)
         try {
             desapilar(p);
         }
-        catch(PilaVaciaUndef)
+        catch(VaciaUndef)
         {
             error = true;
         }

@@ -18,7 +18,7 @@ class AssertionFailed: public exception
             return m_message.c_str();
         }
     private:
-        std::string m_message;
+        string m_message;
 };
 
 // Función para asertar booleanos

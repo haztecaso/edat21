@@ -26,15 +26,6 @@ struct cola {
     int capacidad = CAP_INIC;
 };
 
-// Excepción que lanzan las operaciones parciales que no están definidas para las colas vacías
-struct ColaVaciaUndef : public exception
-{
-    const char * what () const throw ()
-    {
-        return "Operación no definida para las colas vacías";
-    }
-};
-
 // Determina si una cola es vacía
 template <class T> bool es_vacia(cola<T> c);
 
@@ -49,11 +40,11 @@ template <class T> void ampliar_memoria(cola<T> &c);
 template <class T> void encolar(cola<T> &c, T d);
 
 // Elimina el primer elemento de una cola
-// Función parcial: lanza una excepción ColaVaciaUndef si la cola es vacía 
+// Función parcial: lanza una excepción VaciaUndef si la cola es vacía 
 template <class T> void desencolar(cola<T> &c);
 
 // Devuelve el primer elemento de una cola (sin sacarlo de la cola)
-// Función parcial: lanza una excepción ColaVaciaUndef si la cola es vacía 
+// Función parcial: lanza una excepción VaciaUndef si la cola es vacía 
 template <class T> T primero(cola<T> c);
 
 // Libera la memoria de una cola
@@ -103,13 +94,13 @@ template<class T> void encolar(cola<T> &c, T e){
 }
 
 template<class T> void desencolar(cola<T> & c){
-    if(es_vacia(c)) throw ColaVaciaUndef();
+    if(es_vacia(c)) throw VaciaUndef();
     c.primero = (c.primero + 1) % c.capacidad;
     c.tamano--;
 }
 
 template<class T> T primero(cola<T> c){
-    if(es_vacia(c)) throw ColaVaciaUndef();
+    if(es_vacia(c)) throw VaciaUndef();
     return c.datos[c.primero];
 }
 
