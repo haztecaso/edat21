@@ -1,39 +1,77 @@
 #include <iostream>
+#include <stdlib.h>
 #include <string>
-#include "pila_static.hpp"
-
+#include <cassert>
+#include "../tads/pila_static.hpp"
 using namespace std;
 
-typedef string el;
-typedef pila<pila<el> *> super_pila;
+typedef char el;
+
+int n_apilados, n_desapilados, n_errores = 0;
+
+void test_apilar(pila<el> &p);
+void test_desapilar(pila<el> &p);
 
 int main(){
-    super_pila sp;
-    pila<el> *p1 = new pila<el>;
-    pila<el> *p2 = new pila<el>;
-
-    apilar(*p1, string("A"));
-    apilar(*p2, string("B"));
-
-
-    apilar(sp, p1);
-    apilar(sp, p2);
-
-    apilar(*p1, string("B"));
-    apilar(*p2, string("A"));
-
-    cout << sp << endl;
-
-    apilar(*p1, string("B"));
-    apilar(*p2, string("A"));
-    apilar(*p1, string("C"));
-    apilar(*p2, string("C"));
-    apilar(sp, p1);
-    apilar(sp, p1);
-    apilar(sp, p2);
-    apilar(sp, p2);
-
-    cout << sp << endl;
-
+    srand (time(NULL)); // initialize random seed
+    pila<el> p;
+    int n = rand() % 1024 + 1024;
+    n_apilados = 0;
+    n_desapilados = 0;
+    for(int i; i < n; i++)
+    {
+        
+        if (rand() % 100 > 50)
+        {
+            test_apilar(p);
+        }
+        else
+        {
+            test_desapilar(p);
+        }
+    }
+    assert(n == n_apilados+n_desapilados+n_errores);
+    int t = tamano(p);
+    assert(t == n_apilados-n_desapilados);
+    cout << p << endl;
+    liberar(p);
+    t = tamano(p);
+    assert(t == 0);
     return 0;
+}
+
+void test_apilar(pila<el> &p)
+{
+    const int tamano_inicial = tamano(p);
+    el e = (el) 97 + rand() % 26;
+    apilar(p, e);
+    const int tamano_final = tamano(p);
+    assert(tamano_final == tamano_inicial + 1);
+    n_apilados++;
+}
+
+void test_desapilar(pila<el> &p)
+{
+    if(es_vacia(p))
+    {
+        bool error = false;
+        try
+        {
+            desapilar(p);
+        }
+        catch(PilaVaciaUndef)
+        {
+            error = true;
+        }
+        assert(error);
+        n_errores++;
+    }
+    else
+    {
+        const int tamano_inicial = tamano(p);
+        desapilar(p);
+        const int tamano_final = tamano(p);
+        assert(tamano_final == tamano_inicial - 1);
+        n_desapilados++;
+    }
 }
