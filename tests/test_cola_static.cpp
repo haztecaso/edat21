@@ -1,6 +1,6 @@
 #include <iostream>
 #include "cola_static.hpp"
-#include "utils.hpp"
+#include "test_utils.hpp"
 
 using namespace std;
 
