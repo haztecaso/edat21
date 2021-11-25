@@ -36,16 +36,15 @@ struct nodo_simple {
 template<class T>
 struct nodo_doble {
     T dato;
-    nodo_doble<T> * siguiente = nullptr;
-    nodo_doble<T> *  anterior = nullptr;
+    nodo_doble<T> * iz = nullptr;
+    nodo_doble<T> * dr = nullptr;
 };
 
-// Función para crear e inicializar un nuevo nodo simple dado un dato y un nodo siguiente.
+// Crear e inicializa un nuevo nodo simple dado un dato y un nodo siguiente.
 template <class T> nodo_simple<T> * crear_nodo_simple(T d, nodo_simple<T> * s);
 
-// Función para crear e inicializar un nuevo nodo simple dado un dato y sin un
-// nodo siguiente (inicializado con nullptr)
-template <class T> nodo_simple<T> * crear_nodo_simple(T d);
+// Crea e inicializa un nuevo nodo doble dado un dato y los punteros a los nodos iz y dr.
+template <class T> nodo_doble<T> * crear_nodo_doble(T d, nodo_doble<T>* iz, nodo_doble<T>* dr);
 
 /*
  * IMPLEMENTACIONES
@@ -55,13 +54,15 @@ template <class T> nodo_simple<T> * crear_nodo_simple(T d, nodo_simple<T> * s)
 {
     nodo_simple<T> *nodo = new nodo_simple<T>;
     nodo->dato = d;
-    nodo->siguiente= s;
+    nodo->siguiente = s;
     return nodo;
 }
 
-template <class T> nodo_simple<T> * crear_nodo_simple(T d)
+template <class T> nodo_doble<T> * crear_nodo_doble(T d, nodo_doble<T>* iz, nodo_doble<T>* dr)
 {
-    nodo_simple<T> *nodo = new nodo_simple<T>;
+    nodo_doble<T> *nodo = new nodo_doble<T>;
     nodo->dato = d;
+    nodo->iz = iz;
+    nodo->dr = dr;
     return nodo;
 }
