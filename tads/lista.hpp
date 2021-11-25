@@ -15,8 +15,7 @@ using namespace std;
 
 // Definición del tipo para las listas
 // Los valores por defecto corresponden con la representación de una lista vacía
-template<class T>
-struct lista {
+template<class T> struct lista {
     nodo_doble<T> *primero = nullptr;
     nodo_doble<T> *ultimo  = nullptr;
     int tamano = 0;
@@ -55,6 +54,9 @@ template <class T> T ultimo(lista<T> l);
 
 // Libera la memoria de una lista
 template <class T> void liberar(lista<T> &l);
+
+// Ordena una lista utilizando un abb y el recorrido en inorden
+template <class T> void treesort(lista<T> &l);
 
 // Sobrecarga del operador << para imprimir una lista
 template <class T> ostream& operator<<(ostream& os, lista<T> l);
@@ -152,6 +154,19 @@ template <class T> void liberar(lista<T> &l){
     l.primero = nullptr;
     l.ultimo = nullptr;
     l.tamano = 0;
+}
+
+
+// Necesario para que el compilador sepa lo que es un abb sin tener que incluir "abb.hpp" (y por tanto hacer inclusiones recursivas :()
+template<class T> using abb = nodo_doble<T> *;
+
+template <class T> void treesort(lista<T> &l){
+    abb<T> arbol = nullptr;
+    while(!es_vacia(l)){
+        insertar(arbol, primero(l));
+        eliminar_inicio(l);
+    }
+    inorden(arbol, l);
 }
 
 // Sobrecarga del operador << para imprimir una lista
