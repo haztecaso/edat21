@@ -26,10 +26,6 @@ typedef long double el;
 typedef pila<el> mem;
 typedef el *reg;
 
-//TODO: Evitar variables globales
-bool interactive = false;
-bool printed = false;
-
 enum token {
     op_dump,
     op_dumpall,
@@ -56,6 +52,30 @@ enum token {
     const_pi,
     const_e,
 };
+
+//TODO: Evitar variables globales
+bool interactive = false;
+bool printed = false;
+
+// Signaturas
+void require_params(mem m, int n);
+void ejecutar_op(el (*fn)(el), mem &m);
+void ejecutar_op(el (*fn)(el, el), mem &m);
+void print_reg(reg r);
+token parse_token(string word);
+void casos_token(token t, mem &m, reg r);
+void ejecutar(mem &m, reg r, stringstream &source);
+void inicializar_registro(reg r);
+void ejecutar(char * nombre);
+void ejecutar();
+
+int main(int argc, char ** argv) {
+    if (argc >= 2)
+        ejecutar(argv[1]);
+    else
+        ejecutar();
+    return 0;
+}
 
 struct SinParametros: public exception
 {
@@ -318,12 +338,4 @@ void ejecutar()
         if(!es_vacia(*m) && !printed) cout << cima(*m) << endl;
         cout << PROMPT;
     }
-}
-
-int main(int argc, char ** argv) {
-    if (argc >= 2)
-        ejecutar(argv[1]);
-    else
-        ejecutar();
-    return 0;
 }
