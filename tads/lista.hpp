@@ -169,7 +169,6 @@ template <class T> void treesort(lista<T> &l){
     inorden(arbol, l);
 }
 
-// Sobrecarga del operador << para imprimir una lista
 template <class T> ostream& operator<<(ostream& os, lista<T> l){
     os << "[";
     nodo_doble<T> *nodo_actual = l.primero;
