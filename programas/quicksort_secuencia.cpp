@@ -17,24 +17,37 @@ par_int crear(int p, int s);
 bool operator<(par_int e1,par_int e2);
 ostream& operator<<(ostream& os, par_int e);
 
+// Algoritmo de ordenación quicksort para secuencias.
+template<class T> void quicksort(secuencia<T> s);
+
+// Algoritmo recursivo de ordenación quicksort para cadenas de nodos simples.
 template<class T> void quicksort(nodo_simple<T> *inicio, nodo_simple<T> *fin);
+
+// Dada una cadena de nodos simples utiliza el último elemento como pivote y
+// reordena la cadena en dos secciones: una con elementos menores y otra mayores
+// o iguales.
 template<class T> nodo_simple<T> * particion(nodo_simple<T> *inicio, nodo_simple<T> *fin);
 
 int main(){
     secuencia<par_int> s = crear_secuencia<par_int>();
-    for(int i = 0; i< 10; i++){
+    for(int i = 0; i < 10; i++){
       int n = rand() % 100;
+      // Se añaden dos valores con primeras componentes consecutivas y segundas
+      // iguales para verificar más fácilmente si el algoritmo de ordenación es
+      // estable.
       insertar(s,crear(2*i,n));
       insertar(s,crear(2*i+1,n));
     }
 
-    reiniciar(s);
-    nodo_simple<par_int> *i = s.primero->siguiente;
-    nodo_simple<par_int> *f = ultimo(s);
+    // Secuencia antes de ser ordenada
+    cout << s << endl;
 
+    // Se puede observar que esta implementación del quicksort no es estable.
+    quicksort(s);
+
+    // Secuencia despúes de ser ordenada
     cout << s << endl;
-    quicksort(i,f);
-    cout << s << endl;
+
 }
 
 par_int crear(int p, int s){
@@ -53,6 +66,10 @@ ostream& operator<<(ostream& os, par_int e)
     os << "(" << e.primero << "," << e.segundo << ")";
     return os;
 };
+
+template<class T> void quicksort(secuencia<T> s){
+    quicksort(primero(s),ultimo(s));
+}
 
 template<class T> void quicksort(nodo_simple<T> *inicio, nodo_simple<T> *fin)
 {
