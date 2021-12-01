@@ -1,5 +1,5 @@
 #include "test_utils.hpp"
-#include "../tads/lista.hpp"
+#include "lista.hpp"
 
 using namespace std;
 

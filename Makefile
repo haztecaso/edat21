@@ -2,8 +2,8 @@ CC = g++
 CCFLAGS = -O1 -Wall -Wextra -Wshadow -Wdouble-promotion -Werror
 OUT = bin
 
-TESTS = test_pila test_pila_static test_cola test_cola_static test_lista
-PROGRAMAS = calculadora parentesis_equilibrados pilas_de_pilas
+TESTS = test_pila test_pila_static test_cola test_cola_static test_lista test_abb
+PROGRAMAS = calculadora parentesis_equilibrados pilas_de_pilas abb_diagrama
 
 build: tests programas
 

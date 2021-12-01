@@ -46,6 +46,12 @@ template <class T> nodo_simple<T> * crear_nodo_simple(T d, nodo_simple<T> * s);
 // Crea e inicializa un nuevo nodo doble dado un dato y los punteros a los nodos iz y dr.
 template <class T> nodo_doble<T> * crear_nodo_doble(T d, nodo_doble<T>* iz, nodo_doble<T>* dr);
 
+// Intercambia los valores de dos nodos simples
+template <class T> void intercambiar(nodo_simple<T> *a, nodo_simple<T> *b);
+
+// Intercambia los valores de dos nodos dobles
+template <class T> void intercambiar(nodo_doble<T> *a, nodo_doble<T> *b);
+
 /*
  * IMPLEMENTACIONES
  */
@@ -65,4 +71,18 @@ template <class T> nodo_doble<T> * crear_nodo_doble(T d, nodo_doble<T>* iz, nodo
     nodo->iz = iz;
     nodo->dr = dr;
     return nodo;
+}
+
+template <class T> void intercambiar(nodo_simple<T> *a, nodo_simple<T> *b)
+{
+    const T tmp = a->dato;
+    a->dato = b->dato;
+    b->dato = tmp;
+}
+
+template <class T> void intercambiar(nodo_doble<T> *a, nodo_doble<T> *b)
+{
+    const T tmp = a->dato;
+    a->dato = b->dato;
+    b->dato = tmp;
 }

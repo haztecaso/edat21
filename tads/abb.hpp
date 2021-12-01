@@ -75,7 +75,7 @@ template<class T> void subtree_graphviz(ostream &os, string id, abb<T> a){
     if(es_abb_vacio(a)){
         os << sep << nname << id << " [label = \" \", style = invis];" << endl;
     } else {
-        os << sep << nname << id << " [label = " << a->dato << "];" << endl;
+        os << sep << nname << id << " [label = \"" << a->dato << "\"];" << endl;
         os << sep << nname << id << " -> " << nname << id << "i;" << endl;
         subtree_graphviz(os, id + "i", a->iz);
         os << sep << nname << id << " -> " << nname << id << "d;" << endl;
