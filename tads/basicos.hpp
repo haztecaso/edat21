@@ -40,7 +40,7 @@ struct nodo_doble {
     nodo_doble<T> * dr = nullptr;
 };
 
-// Crear e inicializa un nuevo nodo simple dado un dato y un nodo siguiente.
+// Crea e inicializa un nuevo nodo simple dado un dato y un nodo siguiente.
 template <class T> nodo_simple<T> * crear_nodo_simple(T d, nodo_simple<T> * s);
 
 // Crea e inicializa un nuevo nodo doble dado un dato y los punteros a los nodos iz y dr.

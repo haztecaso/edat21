@@ -18,8 +18,7 @@
 
 using namespace std;
 
-template<class T>
-using abb = nodo_doble<T> *;
+template<class T> using abb = nodo_doble<T> *;
 
 // Función para crear un abb vacío
 template<class T> abb<T> abb_vacio();

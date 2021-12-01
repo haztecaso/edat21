@@ -114,6 +114,7 @@ template <typename T> nodo_simple<T> *primero(secuencia<T> s)
 {
     return s.primero->siguiente;
 }
+
 template<class T> nodo_simple<T> *ultimo(secuencia<T> s){
     reiniciar(s);
     nodo_simple<T> *result = nullptr;

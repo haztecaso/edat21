@@ -1,7 +1,7 @@
 #include <sstream>
 #include <iostream>
-#include "../tads/basicos.hpp"
-#include "../tads/secuencia.hpp"
+#include "basicos.hpp"
+#include "secuencia.hpp"
 
 using namespace std;
 
