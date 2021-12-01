@@ -2,3 +2,6 @@ main
 *.o
 bin/
 tarballs/
+*.dot
+*.png
+*.svg

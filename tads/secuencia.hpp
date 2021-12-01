@@ -11,10 +11,11 @@ struct secuencia {
     nodo_simple<T> * anterior; //puntero al anterior al actual
 };
 
-template <typename T> secuencia<T> crear();
+template <typename T> secuencia<T> crear_secuencia();
 template <typename T> void insertar(secuencia<T>& s, T e);
 template <typename T> void eliminar(secuencia<T>& s);
-template <typename T> T actual(const secuencia<T>& s);
+template <typename T> nodo_simple<T> * nodo_actual(const secuencia<T>& s);
+template <typename T> T valor_actual(const secuencia<T>& s);
 template <typename T> void avanzar(secuencia<T>& s);
 template <typename T> void reiniciar(secuencia<T>& s);
 template <typename T> bool fin(secuencia<T> s);
@@ -24,7 +25,7 @@ template <typename T> ostream& operator<<(ostream& os, secuencia<T> s);
  * IMPLEMENTACIONES
  */
 
-template <typename T> secuencia<T> crear()
+template <typename T> secuencia<T> crear_secuencia()
 {
     secuencia<T> s;
     s.primero = new nodo_simple<T>;
@@ -34,26 +35,34 @@ template <typename T> secuencia<T> crear()
 
 template <typename T> void insertar(secuencia<T>& s, T e)
 {
-    nodo_simple<T> * new_node = new nodo_simple<T>;
-    new_node->dato = e;
-    new_node->siguiente = s.anterior->siguiente;
-    s.anterior->siguiente = new_node;
-    s.anterior = new_node;
+    nodo_simple<T> * nodo_nuevo = crear_nodo_simple(e, s.anterior->siguiente);
+    s.anterior->siguiente = nodo_nuevo;
+    s.anterior = nodo_nuevo;
 }
 
 template <typename T> void eliminar(secuencia<T>& s)
 {
     if(!fin(s)){
-        nodo_simple<T> * aux = s.anterior->siguiente;
-        s.anterior->siguiente = aux->siguiente;
-        delete aux;
+        nodo_simple<T> * tmp = s.anterior->siguiente;
+        s.anterior->siguiente = tmp->siguiente;
+        delete tmp;
     }
     else {
         throw runtime_error("final de la secuencia");
     }
 }
 
-template <typename T> T actual(const secuencia<T>& s)
+template <typename T> nodo_simple<T> * nodo_actual(const secuencia<T>& s)
+{
+    if(!fin(s)){
+        return s.anterior->siguiente;
+    }
+    else {
+        throw runtime_error("final de la secuencia");
+    }
+}
+
+template <typename T> T valor_actual(const secuencia<T>& s)
 {
     if(!fin(s)){
         return s.anterior->siguiente->dato;
