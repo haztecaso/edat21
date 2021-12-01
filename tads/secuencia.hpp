@@ -18,6 +18,7 @@ template <typename T> nodo_simple<T> * nodo_actual(const secuencia<T>& s);
 template <typename T> T valor_actual(const secuencia<T>& s);
 template <typename T> void avanzar(secuencia<T>& s);
 template <typename T> void reiniciar(secuencia<T>& s);
+template <typename T> nodo_simple<T> *ultimo(secuencia<T> s);
 template <typename T> bool fin(secuencia<T> s);
 template <typename T> ostream& operator<<(ostream& os, secuencia<T> s);
 
@@ -86,6 +87,17 @@ template <typename T> void reiniciar(secuencia<T>& s)
 {
     s.anterior = s.primero;
 }
+
+template<class T> nodo_simple<T> *ultimo(secuencia<T> s){
+    reiniciar(s);
+    nodo_simple<T> *result = nullptr;
+    while(!fin(s)){
+        result = nodo_actual(s);
+        avanzar(s);
+    }
+    return result;
+}
+
 
 template <typename T> bool fin(secuencia<T> s)
 {
