@@ -12,7 +12,6 @@
 // Definición del tipo para las entradas de las tablas
 // - El tipo K debe tener definidos los operadores == y <=
 // - El tipo V debe tener definida una función V combinar(V v1, V v2)
-//   conmutativa
 template <class K, class V> struct entrada {
     K clave;
     V valor;
@@ -22,7 +21,7 @@ template <class K, class V> struct entrada {
 template <class K, class V> using tabla = abb<entrada<K,V>>;
 
 // Excepción para ser lanzada cuando no se ha encontrado una clave en una tabla
-struct ClaveNoEncontrada: public exception {
+struct ClaveNoEncontrada: public std::exception {
     const char * what () const throw ()
     {
         return "La clave no ha sido encontrada en la tabla";
@@ -38,7 +37,7 @@ template <class K, class V> bool operator<=(entrada<K,V> e1, entrada<K,V> e2);
 template <class K, class V> bool operator==(entrada<K,V> e1, entrada<K,V> e2);
 
 // Operador << para entradas
-template <class K, class V> ostream& operator<<(ostream& os, entrada<K,V> e);
+template <class K, class V> std::ostream& operator<<(std::ostream& os, entrada<K,V> e);
 
 // Crea una tabla vacía
 template <class K, class V> tabla<K,V> tabla_vacia();
@@ -76,7 +75,7 @@ template <class K, class V> bool operator==(entrada<K,V> e1, entrada<K,V> e2){
     return e1.clave == e2.clave;
 }
 
-template <class K, class V> ostream& operator<<(ostream& os, entrada<K,V> e){
+template <class K, class V> std::ostream& operator<<(std::ostream& os, entrada<K,V> e){
     os << "'" << e.clave << "'" << ":" << e.valor;
     return os;
 }
