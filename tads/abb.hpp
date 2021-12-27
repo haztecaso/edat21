@@ -26,8 +26,14 @@ template<class T> abb<T> abb_vacio();
 // Función determinar si un abb es vacío
 template<class T> bool es_abb_vacio(abb<T> a);
 
-// Función para insertar un elemento en un abb
+// Determina si un elemento está en un abb
+template<class T> bool esta(abb<T> &a, T e);
+
+// Inserta un elemento en un abb
 template<class T> void insertar(abb<T> &a, T e);
+
+// Elimina un elemento de un abb
+template<class T> void eliminar(abb<T> &a, T e);
 
 // Recorrido inorden de un abb. Se guarda en una lista que se debe pasar en el
 // segundo parámetro.
@@ -49,13 +55,46 @@ template<class T> bool es_abb_vacio(abb<T> a){
     return a == nullptr;
 }
 
+template<class T> bool esta(abb<T> &a, T e){
+    if(es_abb_vacio(a)) return false;
+    else if(a->dato == e) return true;
+    else return a->dato <= e ? esta(a->dr, e) : esta(a->iz, e);
+}
+
 template<class T> void insertar(abb<T> &a, T e){
     if(es_abb_vacio(a)){
         nodo_doble<T> * nodo_null = nullptr;
         a = crear_nodo_doble(e, nodo_null, nodo_null);
     }
     else{
-        insertar((a->dato > e) ? a->iz : a->dr, e);
+        insertar((a->dato <= e) ? a->dr : a->iz, e);
+    }
+}
+
+template<class T> void eliminar(abb<T> &a, T e){
+    abb<T> b;
+    if(!es_abb_vacio(a)){
+        if(a->dato == e){
+            if(es_abb_vacio(a->dr)){
+                b = a;
+                a = a->iz;
+                delete b;
+            }
+            else if(es_abb_vacio(a->iz)){
+                b = a;
+                a = a->dr;
+                delete b;
+            }
+            else{
+                //TODO
+            }
+        }
+        else if(e <= a->valor){
+            eliminar(a->dr);
+        }
+        else if(e <= a->valor){
+            eliminar(a->iz);
+        }
     }
 }
 
