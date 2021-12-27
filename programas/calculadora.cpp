@@ -20,7 +20,9 @@
 #define NUMERO_REGISTROS 16
 #define PROMPT ">> "
 
-using namespace std;
+using std::string;
+using std::stringstream;
+using std::cout;
 
 typedef long double el;
 typedef pila<el> mem;
@@ -77,7 +79,7 @@ int main(int argc, char ** argv) {
     return 0;
 }
 
-struct SinParametros: public exception
+struct SinParametros: public std::exception
 {
     const char * what () const throw ()
     {
@@ -88,7 +90,7 @@ struct SinParametros: public exception
 void require_params(mem m, int n)
 {
     if (m.tamano < n)
-        throw "La operación requiere " + to_string(n) + " parámetros";
+        throw "La operación requiere " + std::to_string(n) + " parámetros";
 }
 
 void ejecutar_op(el (*fn)(el), mem &m)
@@ -158,30 +160,30 @@ void casos_token(token t, mem &m, reg r)
             require_params(m, 1);
             rd0 = cima(m);
             cout << rd0 << " ";
-            if (interactive) cout << endl;
+            if (interactive) cout << '\n';
             printed = true;
             break;
         case op_printreg:
             print_reg(r);
-            if (interactive) cout << endl;
+            if (interactive) cout << '\n';
             printed = true;
             break;
         case op_printmem:
             cout << "mem: " << m;
-            if (interactive) cout << endl;
+            if (interactive) cout << '\n';
             printed = true;
             break;
         case op_printall:
-            cout << "mem: " << m << endl;
+            cout << "mem: " << m << '\n';
             print_reg(r);
-            if (interactive) cout << endl;
+            if (interactive) cout << '\n';
             printed = true;
             break;
         case op_dumpprint:
             require_params(m, 1);
             rd0 = cima_y_desapilar(m);
             cout << rd0 << " ";
-            if (interactive) cout << endl;
+            if (interactive) cout << '\n';
             printed = true;
             break;
         case op_dup:
@@ -227,16 +229,16 @@ void casos_token(token t, mem &m, reg r)
             ejecutar_op(powl, m);
             break;
         case op_sen:
-            ejecutar_op(sin, m);
+            ejecutar_op(std::sin, m);
             break;
         case op_cos:
-            ejecutar_op(cos, m);
+            ejecutar_op(std::cos, m);
             break;
         case op_tan:
-            ejecutar_op(tan, m);
+            ejecutar_op(std::tan, m);
             break;
         case op_gamma:
-            ejecutar_op(tgamma, m);
+            ejecutar_op(std::tgamma, m);
             break;
         case op_read: // indice read
             require_params(m, 1);
@@ -267,23 +269,23 @@ void ejecutar(mem &m, reg r, stringstream &source)
             el valor = stold(word);
             apilar(m, valor);
         }
-        catch (invalid_argument const&)
+        catch (std::invalid_argument const&)
         {
             try{
                 token t = parse_token(word);
                 try
                 {
                     casos_token(t, m, r); 
-                    cout << flush;
+                    cout << std::flush;
                 }
                 catch (VaciaUndef const&)
                 {
-                    cout << "ERROR: memoria vacía." << endl;
+                    cout << "ERROR: memoria vacía." << '\n';
                 }
             }
             catch(string s)
             {
-                cout << "ERROR: " << s << endl;
+                cout << "ERROR: " << s << '\n';
             }
         }
         ejecutar(m, r, source);
@@ -293,24 +295,24 @@ void ejecutar(mem &m, reg r, stringstream &source)
 // LEER PROGRAMA DESDE FICHERO 
 void ejecutar(char * nombre) 
 {
-    ifstream file;
+    std::ifstream file;
     file.open(nombre);
     if (!file.is_open()) throw "ERROR: Archivo abierto";
     mem *m = new mem;
     el r[NUMERO_REGISTROS];
     inicializar_registro(r);
-    cout << setprecision(PRECISION);
+    cout << std::setprecision(PRECISION);
     try
     {
         stringstream source;
         source << file.rdbuf();
         file.close();
         ejecutar(*m, r, source);
-        cout << endl;
+        cout << '\n';
     }
     catch(string err)
     {
-        cout << endl << "Error: " << err << endl;
+        cout << '\n' << "Error: " << err << '\n';
     }
     delete m;
 }
@@ -324,12 +326,12 @@ void ejecutar()
     mem *m = new mem;
     el r[NUMERO_REGISTROS];
     inicializar_registro(r);
-    while(cin.getline(input, 256))
+    while(std::cin.getline(input, 256))
     {
         stringstream source = stringstream(string(input));
         printed = false;
         ejecutar(*m, r, source);
-        if(!es_vacia(*m) && !printed) cout << cima(*m) << endl;
+        if(!es_vacia(*m) && !printed) cout << cima(*m) << '\n';
         cout << PROMPT;
     }
 }

@@ -11,8 +11,6 @@
 #include <sstream>
 #include "basicos.hpp"
 
-using namespace std;
-
 // Definición del tipo para las colas
 // Representación de las colas mediante arrays circulares.
 // Los valores por defecto corresponden con la representación de una cola vacía
@@ -50,10 +48,10 @@ template <class T> T primero(cola<T> c);
 template <class T> void liberar(cola<T> &c);
 
 // Sobrecarga del operador << para imprimir las colas
-template <class T> ostream& operator<<(ostream& os, cola<T> c);
+template <class T> std::ostream& operator<<(std::ostream& os, cola<T> c);
 
 // Sobrecarga del operador << para imprimir punteros a colas
-template <class T> ostream& operator<<(ostream& os, cola<T> *c);
+template <class T> std::ostream& operator<<(std::ostream& os, cola<T> *c);
 
 /*
  * IMPLEMENTACIONES
@@ -112,7 +110,7 @@ template<class T> void liberar(cola<T> &c)
     c.capacidad = 0;
 }
 
-template<class T> ostream& operator<<(ostream& os, cola<T> c)
+template<class T> std::ostream& operator<<(std::ostream& os, cola<T> c)
 {
     os << "[";
     for(int i = 0; i < c.tamano ; i++){
@@ -123,7 +121,7 @@ template<class T> ostream& operator<<(ostream& os, cola<T> c)
     return os;
 }
 
-template<class T> ostream& operator<<(ostream& os, cola<T> *c)
+template<class T> std::ostream& operator<<(std::ostream& os, cola<T> *c)
 {
     os << "*" << c;
     return os;

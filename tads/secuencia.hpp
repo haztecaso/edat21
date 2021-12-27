@@ -1,9 +1,7 @@
 #include <sstream>
 #include "basicos.hpp"
 
-using namespace std;
-
-const string FLECHA = "↓";
+const std::string FLECHA = "↓";
 
 template <typename T>
 struct secuencia {
@@ -42,7 +40,7 @@ template <typename T> nodo_simple<T> *ultimo(secuencia<T> s);
 template <typename T> bool fin(secuencia<T> s);
 
 // Sobrecarga del operador << para imprimir una secuencia
-template <typename T> ostream& operator<<(ostream& os, secuencia<T> s);
+template <typename T> std::ostream& operator<<(std::ostream& os, secuencia<T> s);
 
 /*
  * IMPLEMENTACIONES
@@ -71,7 +69,7 @@ template <typename T> void eliminar(secuencia<T>& s)
         delete tmp;
     }
     else {
-        throw runtime_error("final de la secuencia");
+        throw std::runtime_error("final de la secuencia");
     }
 }
 
@@ -81,7 +79,7 @@ template <typename T> nodo_simple<T> * nodo_actual(const secuencia<T>& s)
         return s.anterior->siguiente;
     }
     else {
-        throw runtime_error("final de la secuencia");
+        throw std::runtime_error("final de la secuencia");
     }
 }
 
@@ -91,7 +89,7 @@ template <typename T> T valor_actual(const secuencia<T>& s)
         return s.anterior->siguiente->dato;
     }
     else {
-        throw runtime_error("final de la secuencia");
+        throw std::runtime_error("final de la secuencia");
     }
 }
 
@@ -101,7 +99,7 @@ template <typename T> void avanzar(secuencia<T>& s)
         s.anterior = s.anterior->siguiente;
     }
     else {
-        throw runtime_error("final de la secuencia");
+        throw std::runtime_error("final de la secuencia");
     }
 }
 
@@ -131,7 +129,7 @@ template <typename T> bool fin(secuencia<T> s)
     return s.anterior->siguiente == NULL;
 }
 
-template <typename T> ostream& operator<<(ostream& os, secuencia<T> s)
+template <typename T> std::ostream& operator<<(std::ostream& os, secuencia<T> s)
 {
     nodo_simple<T> * aux = s.primero;
     while(aux->siguiente != NULL){

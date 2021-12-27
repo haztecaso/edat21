@@ -7,7 +7,7 @@
 #include <cstddef>
 #include "abb.hpp"
 
-/* STRUCTS Y TIPOS */ 
+/* STRUCTS Y TIPOS */
 
 // Definición del tipo para las entradas de las tablas
 // - El tipo K debe tener definidos los operadores == y <=

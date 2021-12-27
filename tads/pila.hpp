@@ -11,8 +11,6 @@
 #include <sstream>
 #include "basicos.hpp"
 
-using namespace std;
-
 // Definición del tipo para las pilas
 // Los valores por defecto corresponden con la representación de una pila vacía
 template<class T>
@@ -46,10 +44,10 @@ template <class T> T cima_y_desapilar(pila<T> &p);
 template <class T> void liberar(pila<T> &p);
 
 // Sobrecarga del operador << para imprimir una pila
-template <class T> ostream& operator<<(ostream& os, pila<T> p);
+template <class T> std::ostream& operator<<(std::ostream& os, pila<T> p);
 
 // Sobrecarga del operador << para imprimir un puntero a una pila
-template <class T> ostream& operator<<(ostream& os, pila<T> *p);
+template <class T> std::ostream& operator<<(std::ostream& os, pila<T> *p);
 
 /*
  * IMPLEMENTACIONES
@@ -101,7 +99,7 @@ template <class T> void liberar(pila<T> &p)
     while(!es_vacia(p)) desapilar(p);
 }
 
-template <class T> ostream& operator<<(ostream& os, pila<T> p)
+template <class T> std::ostream& operator<<(std::ostream& os, pila<T> p)
 {
     nodo_simple<T> *nodo_actual = p.cima;
     os << "[";
@@ -116,7 +114,7 @@ template <class T> ostream& operator<<(ostream& os, pila<T> p)
     return os;
 }
 
-template <class T> ostream& operator<<(ostream& os, pila<T> *p)
+template <class T> std::ostream& operator<<(std::ostream& os, pila<T> *p)
 {
     os << "*" << *p;
     return os;

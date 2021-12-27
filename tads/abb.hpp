@@ -11,12 +11,8 @@
 #include <stdexcept>
 #include <sstream>
 #include <fstream>
-#include <string>
-
 #include "basicos.hpp"
 #include "lista.hpp"
-
-using namespace std;
 
 template<class T> using abb = nodo_doble<T> *;
 
@@ -39,8 +35,8 @@ template<class T> void eliminar(abb<T> &a, T e);
 // segundo parámetro.
 template<class T> void inorden(abb<T> a, lista<T> &result);
 
-template<class T> void abb_graphviz(ostream &os, abb<T> a);
-template<class T> void abb_graphviz(string filename, abb<T> a);
+template<class T> void abb_graphviz(std::ostream &os, abb<T> a);
+template<class T> void abb_graphviz(std::string filename, abb<T> a);
 
 
 /*
@@ -106,30 +102,30 @@ template<class T> void inorden(abb<T> a, lista<T> &result){
     }
 }
 
-const string sep = "    ";
-const string nname = "abb_node";
+const std::string sep = "    ";
+const std::string nname = "abb_node";
 
-template<class T> void subtree_graphviz(ostream &os, string id, abb<T> a){
+template<class T> void subtree_graphviz(std::ostream &os, std::string id, abb<T> a){
     if(es_abb_vacio(a)){
-        os << sep << nname << id << " [label = \" \", style = invis];" << endl;
+        os << sep << nname << id << " [label = \" \", style = invis];\n";
     } else {
-        os << sep << nname << id << " [label = \"" << a->dato << "\"];" << endl;
-        os << sep << nname << id << " -> " << nname << id << "i;" << endl;
+        os << sep << nname << id << " [label = \"" << a->dato << "\"];\n";
+        os << sep << nname << id << " -> " << nname << id << "i;\n";
         subtree_graphviz(os, id + "i", a->iz);
-        os << sep << nname << id << " -> " << nname << id << "d;" << endl;
+        os << sep << nname << id << " -> " << nname << id << "d;\n";
         subtree_graphviz(os, id + "d", a->dr);
     }
 }
 
-template<class T> void abb_graphviz(ostream &os, abb<T> a){
-    os << "digraph ABB {" << endl;
-    os << sep << "node [shape = circle]" << endl;
+template<class T> void abb_graphviz(std::ostream &os, abb<T> a){
+    os << "digraph ABB {\n";
+    os << sep << "node [shape = circle]\n";
     subtree_graphviz(os, "", a);
-    os << "}" << endl;
+    os << "}\n";
 }
 
-template<class T> void abb_graphviz(string filename, abb<T> a){
-    ofstream file;
+template<class T> void abb_graphviz(std::string filename, abb<T> a){
+    std::ofstream file;
     file.open(filename);
     abb_graphviz(file, a);
     file.close();

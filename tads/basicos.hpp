@@ -10,14 +10,12 @@
 #pragma once
 #include <exception>
 
-using namespace std;
-
 // Constantes
 const int CAP_INIC = 16;
 const int MULT_CRECIMIENTO = 2;
 
 // Excepción que lanzan las operaciones parciales que no están definidas para estructuras de datos vacías
-struct VaciaUndef: public exception
+struct VaciaUndef: public std::exception
 {
     const char * what () const throw ()
     {

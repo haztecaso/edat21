@@ -11,8 +11,6 @@
 #include <sstream>
 #include "basicos.hpp"
 
-using namespace std;
-
 // Definición del tipo para las listas
 // Los valores por defecto corresponden con la representación de una lista vacía
 template<class T> struct lista {
@@ -59,7 +57,7 @@ template <class T> void liberar(lista<T> &l);
 template <class T> void treesort(lista<T> &l);
 
 // Sobrecarga del operador << para imprimir una lista
-template <class T> ostream& operator<<(ostream& os, lista<T> l);
+template <class T> std::ostream& operator<<(std::ostream& os, lista<T> l);
 
 /*
  * IMPLEMENTACIONES
@@ -169,7 +167,7 @@ template <class T> void treesort(lista<T> &l){
     inorden(arbol, l);
 }
 
-template <class T> ostream& operator<<(ostream& os, lista<T> l){
+template <class T> std::ostream& operator<<(std::ostream& os, lista<T> l){
     os << "[";
     nodo_doble<T> *nodo_actual = l.primero;
     while (nodo_actual != nullptr)
