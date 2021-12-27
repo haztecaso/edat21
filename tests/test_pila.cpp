@@ -1,8 +1,8 @@
 #include "test_utils.hpp"
 #ifndef STATIC
-    #include "pila.hpp"
+    #include "../tads/pila.hpp"
 #else
-    #include "pila_static.hpp"
+    #include "../tads/pila_static.hpp"
 #endif
 
 using namespace std;

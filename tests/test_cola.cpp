@@ -1,8 +1,8 @@
 #include "test_utils.hpp"
 #ifndef STATIC
-    #include "cola.hpp"
+    #include "../tads/cola.hpp"
 #else
-    #include "cola_static.hpp"
+    #include "../tads/cola_static.hpp"
 #endif
 
 using namespace std;

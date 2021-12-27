@@ -12,9 +12,9 @@
 #include <functional>
 #include <cmath>
 
-#include "basicos.hpp"
-#include "pila.hpp"
-#include "cola.hpp"
+#include "../tads/basicos.hpp"
+#include "../tads/pila.hpp"
+#include "../tads/cola.hpp"
 
 #define PRECISION 12
 #define NUMERO_REGISTROS 16
@@ -65,9 +65,9 @@ void print_reg(reg r);
 token parse_token(string word);
 void casos_token(token t, mem &m, reg r);
 void ejecutar(mem &m, reg r, stringstream &source);
-void inicializar_registro(reg r);
 void ejecutar(char * nombre);
 void ejecutar();
+void inicializar_registro(reg r);
 
 int main(int argc, char ** argv) {
     if (argc >= 2)
@@ -290,12 +290,6 @@ void ejecutar(mem &m, reg r, stringstream &source)
     }
 }
 
-void inicializar_registro(reg r)
-{
-    for (int i = 0; i < NUMERO_REGISTROS; i++)
-        r[i] = 0;
-}
-
 // LEER PROGRAMA DESDE FICHERO 
 void ejecutar(char * nombre) 
 {
@@ -339,3 +333,9 @@ void ejecutar()
         cout << PROMPT;
     }
 }
+
+void inicializar_registro(reg r)
+{
+    for (int i = 0; i < NUMERO_REGISTROS; i++) r[i] = 0;
+}
+
