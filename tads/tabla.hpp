@@ -161,15 +161,9 @@ template <class K, class V> void eliminar(tabla<K,V> t, K clave){
 }
 
 template <class K, class V> std::ostream& operator<<(std::ostream& os, tabla<K,V> t){
-    lista<entrada<K,V>> l;
-    inorden(t, l);
-    nodo_doble<entrada<K,V>> *nodo_actual = l.primero;
-    while (nodo_actual != nullptr)
-    {
-        os << nodo_actual->dato;
-        if (nodo_actual != l.ultimo) os << "\n";
-        nodo_actual = nodo_actual->dr;
-    }
+    std::vector<entrada<K,V>> v;
+    inorden(t, v);
+    for(entrada<K,V> e:v) os << e << "\n";
     return os;
 }
 

@@ -11,8 +11,8 @@
 #include <stdexcept>
 #include <sstream>
 #include <fstream>
+#include <vector>
 #include "basicos.hpp"
-#include "lista.hpp"
 
 template<class T> using abb = nodo_doble<T> *;
 
@@ -33,7 +33,7 @@ template<class T> void eliminar(abb<T> &a, T e);
 
 // Recorrido inorden de un abb. Se guarda en una lista que se debe pasar en el
 // segundo parámetro.
-template<class T> void inorden(abb<T> a, lista<T> &result);
+template<class T> void inorden(abb<T> a, std::vector<T> &result);
 
 template<class T> void abb_graphviz(std::ostream &os, abb<T> a);
 template<class T> void abb_graphviz(std::string filename, abb<T> a);
@@ -94,10 +94,10 @@ template<class T> void eliminar(abb<T> &a, T e){
     }
 }
 
-template<class T> void inorden(abb<T> a, lista<T> &result){
+template<class T> void inorden(abb<T> a, std::vector<T> &result){
     if(!es_abb_vacio(a)){
     inorden(a->iz, result);
-    insertar_final(result, a->dato);
+    result.push_back(a->dato);
     inorden(a->dr, result);
     }
 }
