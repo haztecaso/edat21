@@ -18,7 +18,7 @@ $(OUT)/test_%_static: tests/test_%.cpp tests/test_utils.hpp tads
 	$(CC) $(CCFLAGS) -D STATIC $< -o $@
 
 .PHONY: test test_%
-test: $(TESTS)
+test: mkdirs $(TESTS)
 test_%: $(OUT)/test_%
 	./$<
 

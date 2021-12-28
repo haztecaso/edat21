@@ -4,6 +4,7 @@
 
 #include "basicos.hpp"
 #include "tabla.hpp"
+#include <iostream>
 #include <sstream>
 #include <fstream>
 #include <vector>
@@ -37,10 +38,11 @@ template <class K> struct nodo: nodo_h<K> {
 
 template <class K> using ahuff = nodo_h<K>*;
 
-
 template <class K> ahuff<K> crear_hoja(K clave, int frec);
 
 template <class K> ahuff<K> plantar(ahuff<K> a1, ahuff<K> a2);
+
+template <class K> struct AHuffCompare;
 
 template <class K> ahuff<K> ahuff_desde_frecuencias(tabla_frecuencias<K>);
 
@@ -69,8 +71,34 @@ template <class K> ahuff<K> plantar(ahuff<K> hijo_iz, ahuff<K> hijo_dr){
     return a;
 }
 
-template <class K> ahuff<K> ahuff_desde_frecuencias(tabla_frecuencias<K>){
-    std::priority_queue<ahuff<K>,std::vector<ahuff<K>>> q;
+template <class K> struct AHuffCompare {
+    bool operator()(const ahuff<K> a1, const ahuff<K> a2){
+        return a1->frec > a2->frec;
+    }
+};
+
+template <class K>void cola_desde_frecuencias(tabla_frecuencias<K> tfrec, std::priority_queue<ahuff<K>,std::vector<ahuff<K>>, AHuffCompare<K>> &q){
+    if(!es_abb_vacio(tfrec)){
+        cola_desde_frecuencias(tfrec->iz, q);
+        ahuff<K> h = crear_hoja(tfrec->dato.clave, tfrec->dato.valor);
+        q.push(h);
+        cola_desde_frecuencias(tfrec->dr, q);
+    }
+}
+
+template <class K> ahuff<K> ahuff_desde_frecuencias(tabla_frecuencias<K> tfrec){
+    std::priority_queue<ahuff<K>,std::vector<ahuff<K>>, AHuffCompare<K>> q;
+    cola_desde_frecuencias(tfrec, q);
+    ahuff<K> a, b, c;
+    while(q.size() > 1){
+        a = q.top();
+        q.pop();
+        b = q.top();
+        q.pop();
+        c = plantar(a, b);
+        q.push(c);
+    }
+    return q.top();
 }
 
 template<class K> void subtree_graphviz(std::ostream &os, std::string id, ahuff<K> a){

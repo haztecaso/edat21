@@ -45,6 +45,9 @@ template <class K, class V> std::ostream& operator<<(std::ostream& os, entrada<K
 // Crea una tabla vacía
 template <class K, class V> tabla<K,V> tabla_vacia();
 
+// Crea una tabla de frecuencias vacía
+template <class K, class V> tabla<K,V> tabla_frecuencias_vacia();
+
 // Determina si una tabla está vacía
 template <class K, class V> bool es_tabla_vacia(tabla<K,V> t);
 
@@ -90,6 +93,10 @@ template <class K, class V> std::ostream& operator<<(std::ostream& os, entrada<K
 
 template <class K, class V> tabla<K,V> tabla_vacia(){
     return abb_vacio<entrada<K,V>>();
+}
+
+template <class K> tabla_frecuencias<K> tabla_frecuencias_vacia(){
+    return tabla_vacia<K, int>();
 }
 
 template <class K, class V> bool es_tabla_vacia(tabla<K,V> t){
