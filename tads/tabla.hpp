@@ -20,6 +20,9 @@ template <class K, class V> struct entrada {
 // Definición del tipo de las tablas (mediante árboles binarios)
 template <class K, class V> using tabla = abb<entrada<K,V>>;
 
+// Tabla de frecuencias (valores de tipo int)
+template <class K> using tabla_frecuencias = tabla<K,int>;
+
 // Excepción para ser lanzada cuando no se ha encontrado una clave en una tabla
 struct ClaveNoEncontrada: public std::exception {
     const char * what () const throw ()
@@ -65,6 +68,11 @@ template <class K, class V> void aniadir(tabla<K,V> &t, entrada<K,V> e);
 // Función parcial: si la clave no está en la tabla se lanza la excepción ClaveNoEncontrada
 template <class K, class V> void eliminar(tabla<K,V> t, K clave);
 
+template <class K, class V> std::ostream& operator<<(std::ostream& os, tabla<K,V> t);
+
+// Devuelve una tabla de frecuencias de los caracteres de un texto.
+tabla_frecuencias<char> frecuencias_char(std::string texto);
+
 /* IMPLEMENTACIONES */
 
 template <class K, class V> bool operator<=(entrada<K,V> e1, entrada<K,V> e2){
@@ -76,7 +84,7 @@ template <class K, class V> bool operator==(entrada<K,V> e1, entrada<K,V> e2){
 }
 
 template <class K, class V> std::ostream& operator<<(std::ostream& os, entrada<K,V> e){
-    os << "'" << e.clave << "'" << ":" << e.valor;
+    os <<"(" << e.clave << ", " << e.valor << ")";
     return os;
 }
 
@@ -131,4 +139,25 @@ template <class K, class V> void aniadir(tabla<K,V> &t, entrada<K,V> e){
 
 template <class K, class V> void eliminar(tabla<K,V> t, K clave){
     //TODO
+}
+
+template <class K, class V> std::ostream& operator<<(std::ostream& os, tabla<K,V> t){
+    lista<entrada<K,V>> l;
+    inorden(t, l);
+    nodo_doble<entrada<K,V>> *nodo_actual = l.primero;
+    while (nodo_actual != nullptr)
+    {
+        os << nodo_actual->dato;
+        if (nodo_actual != l.ultimo) os << "\n";
+        nodo_actual = nodo_actual->dr;
+    }
+    return os;
+}
+
+tabla_frecuencias<char> frecuencias_char(std::string texto){
+    tabla_frecuencias<char> tabla = tabla_vacia<char,int>();
+    for (char const &c: texto){
+        aniadir(tabla, c, 1);
+    }
+    return tabla;
 }
