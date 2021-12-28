@@ -1,9 +1,8 @@
+#include <iostream>
 #include "test_utils.hpp"
 #include "../tads/abb.hpp"
 
-typedef int el;
-
 int main(){
-    //TODO: implementar tests para las operaciones de árboles
+    std::cout << "TODO: Test ABB's" << std::endl;
     return 0;
 }
