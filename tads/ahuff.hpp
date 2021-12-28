@@ -35,15 +35,12 @@ template <class K> struct nodo: nodo_h<K> {
     }
 };
 
-template <class K> struct ahuff {
-    nodo_h<K> * raiz;
-};
+template <class K> using ahuff = nodo_h<K>*;
+
 
 template <class K> ahuff<K> crear_hoja(K clave, int frec);
 
 template <class K> ahuff<K> plantar(ahuff<K> a1, ahuff<K> a2);
-
-template <class K> bool operator>(ahuff<K> h1, ahuff<K> h2);
 
 template <class K> ahuff<K> ahuff_desde_frecuencias(tabla_frecuencias<K>);
 
@@ -61,28 +58,25 @@ template <class K> void test(hoja<K> a){
 }
 
 template <class K> ahuff<K> crear_hoja(K clave, int frec){
-    ahuff<K> a;
-    a.raiz = new hoja<K>(clave, frec);
-    return a;
+    return new hoja<K>(clave, frec);
 }
 
 template <class K> ahuff<K> plantar(ahuff<K> hijo_iz, ahuff<K> hijo_dr){
-    ahuff<K> a;
-    a.raiz = new nodo<K>;
-    a.raiz->hijo_iz = hijo_iz.raiz;
-    a.raiz->hijo_dr = hijo_dr.raiz;
-    a.raiz->frec = hijo_dr.raiz->frec + hijo_iz.raiz->frec;
+    ahuff<K> a = new nodo<K>;
+    a->hijo_iz = hijo_iz;
+    a->hijo_dr = hijo_dr;
+    a->frec = hijo_dr->frec + hijo_iz->frec;
     return a;
 }
 
-template <class K> bool operator>(ahuff<K> h1, ahuff<K> h2){
-    return h1.raiz->frec > h2.raiz->frec;
+template <class K> ahuff<K> ahuff_desde_frecuencias(tabla_frecuencias<K>){
+    std::priority_queue<ahuff<K>,std::vector<ahuff<K>>> q;
 }
 
-template<class K> void subtree_graphviz(std::ostream &os, std::string id, nodo_h<K>* a){
+template<class K> void subtree_graphviz(std::ostream &os, std::string id, ahuff<K> a){
     if(a->es_hoja()){
         os << "    " << "ahuff_node" << id << " [shape=\"record\" ";
-        os << "label = \"" << a->clave << "|" << a->frec << "\"];\n";
+        os << "label = \"{" << a->frec << "|" << a->clave << "}\"];\n";
     }
     else{
         os << "    " << "ahuff_node" << id << " [label = \"" << a->frec << "\"];\n";
@@ -96,7 +90,7 @@ template<class K> void subtree_graphviz(std::ostream &os, std::string id, nodo_h
 template <class K> void ahuff_graphviz(std::ostream &os, ahuff<K> a){
     os << "digraph AHuffman {\n";
     os << sep << "node [shape = circle]\n";
-    subtree_graphviz(os, "", a.raiz);
+    subtree_graphviz(os, "", a);
     os << "}\n";
 }
 
