@@ -6,6 +6,7 @@
 #include <sstream>
 #include <cstddef>
 #include <vector>
+#include <fstream>
 #include "abb.hpp"
 
 /* STRUCTS Y TIPOS */
@@ -47,7 +48,7 @@ template <class K, class V> std::ostream& operator<<(std::ostream& os, entrada<K
 template <class K, class V> tabla<K,V> tabla_vacia();
 
 // Crea una tabla de frecuencias vacía
-template <class K, class V> tabla<K,V> tabla_frecuencias_vacia();
+template <class K> tabla_frecuencias<K> tabla_frecuencias_vacia();
 
 // Determina si una tabla está vacía
 template <class K, class V> bool es_tabla_vacia(tabla<K,V> t);
@@ -173,7 +174,7 @@ template <class K, class V> std::ostream& operator<<(std::ostream& os, tabla<K,V
 }
 
 tabla_frecuencias<char> frecuencias_char(std::string texto){
-    tabla_frecuencias<char> tabla = tabla_vacia<char,int>();
+    tabla_frecuencias<char> tabla = tabla_frecuencias_vacia<char>();
     for (char const &c: texto){
         aniadir(tabla, c, 1);
     }
