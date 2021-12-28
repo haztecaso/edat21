@@ -36,12 +36,13 @@ tabla<char, codigo_h> leer_tabla_codigos(ifstream &f){
     return t;
 }
 
-    /*
-vector<bool> leer_datos(ifstream f){
+vector<bool> leer_datos(ifstream &f){
     long num_bits;
     vector<bool> result;
     f >> num_bits;
-    unsigned char c;
+    char c;
+    f.get(c);
+    if(c!=';') throw runtime_error("Error al leer los datos: se esperaba un ';' después del entero con la longitud de los datos");
     string s;
     getline(f,s); 
     long pos = 0;
@@ -61,7 +62,6 @@ vector<bool> leer_datos(ifstream f){
     f.close();
     return result; 
 }
-*/
 
 int main(int argc, char** argv){
     if(argc != 2){
@@ -73,7 +73,11 @@ int main(int argc, char** argv){
 
     cout << "- Leyendo tabla de códigos" << endl;
     tabla<char, codigo_h> tabla_codigos = leer_tabla_codigos(f);
+
+    vector<bool> datos = leer_datos(f);
+
     cout << tabla_codigos;
+    cout << datos;
 
     return 0;
 }  
