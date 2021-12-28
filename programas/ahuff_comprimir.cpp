@@ -22,9 +22,8 @@ stringstream codificar_tabla(tabla<char,codigo_h> tabla_codigos){
     stringstream s;
     vector<ecod> v = vector<ecod>();
     inorden(tabla_codigos, v);
-    for (ecod e: v){
-        s << e.clave << ":" << e.valor << ";";
-    }
+    for (ecod e: v) s << e.clave << ":" << e.valor << ";";
+    s << ";;";
     return s;
 }
 
@@ -71,7 +70,7 @@ int main(int argc, char** argv){
     string filename = string(argv[1]);
     ifstream f = ifstream(filename);
 
-    cout << "- Generando tabla de frecuencias desde el fichero " << filename << endl;
+    cout << "- Generando tabla de frecuencias" << endl;
     tabla_frecuencias<char> frecs = construir_tabla_frecuencias(f);
 
     cout << "- Generando Árbol de Huffman" << endl;
