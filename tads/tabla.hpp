@@ -5,6 +5,7 @@
 #pragma once
 #include <sstream>
 #include <cstddef>
+#include <vector>
 #include "abb.hpp"
 
 /* STRUCTS Y TIPOS */
@@ -59,7 +60,13 @@ template <class K, class V> bool esta_clave(tabla<K,V> t, K clave);
 template <class K, class V> V consultar(tabla<K,V> t, K clave);
 
 // Función combinar para enteros
+template <class V> V combinar(V a, V b);
+
+// Función combinar para enteros
 int combinar(int a, int b);
+
+// Función combinar para codigos binarios
+std::vector<bool> combinar(std::vector<bool>, std::vector<bool>);
 
 // Añade una clave y valor (que forman una entrada) a una tabla
 template <class K, class V> void aniadir(tabla<K,V> &t, K clave, V valor);
@@ -125,6 +132,10 @@ template <class K, class V> V consultar(tabla<K,V> t, K clave){
 
 int combinar(int a, int b){
     return a + b;
+}
+
+std::vector<bool> combinar(std::vector<bool>, std::vector<bool>){
+    throw std::runtime_error("Un caracter nopuede tener varios códigos");
 }
 
 template <class K, class V> void aniadir(tabla<K,V> &t, K clave, V valor){

@@ -38,25 +38,24 @@ template <class K> struct nodo: nodo_h<K> {
 
 template <class K> using ahuff = nodo_h<K>*;
 
+codigo_h codigo_vacio();
+std::ostream& operator<<(std::ostream& os, codigo_h codigo);
+
 template <class K> ahuff<K> crear_hoja(K clave, int frec);
-
 template <class K> ahuff<K> plantar(ahuff<K> a1, ahuff<K> a2);
-
 template <class K> struct AHuffCompare;
-
-template <class K> ahuff<K> ahuff_desde_frecuencias(tabla_frecuencias<K>);
-
+template <class K> ahuff<K> ahuff_desde_frecuencias(tabla_frecuencias<K> tfrec);
+template <class K> tabla<K, codigo_h> tabla_codigos(ahuff<K> a);
 template <class K> void ahuff_graphviz(std::ostream &os, ahuff<K> a);
 template <class K> void ahuff_graphviz(std::string filename, ahuff<K> a);
 
-// Para usar las hojas
-template <class K> void test(hoja<K> a){
- if (a->es_hoja()){
-    ((hoja<K> *) a)->clave;
- }
- else {
-    ((nodo<K> *) a)->clave;
- }
+codigo_h codigo_vacio(){
+    return std::vector<bool>();
+}
+
+std::ostream& operator<<(std::ostream& os, codigo_h codigo){
+    for (bool b:codigo) os << (b ? 1 : 0);
+    return os;
 }
 
 template <class K> ahuff<K> crear_hoja(K clave, int frec){
@@ -77,7 +76,14 @@ template <class K> struct AHuffCompare {
     }
 };
 
-template <class K>void cola_desde_frecuencias(tabla_frecuencias<K> tfrec, std::priority_queue<ahuff<K>,std::vector<ahuff<K>>, AHuffCompare<K>> &q){
+// Función auxiliar para convertir una tabla de frecuencias en una cola con
+// prioridad de hojas, utilizando un recorrido en inorden por el ABB de la tabla
+// de frecuencias.
+template <class K>
+void cola_desde_frecuencias(
+        tabla_frecuencias<K> tfrec,
+        std::priority_queue<ahuff<K>,std::vector<ahuff<K>>, AHuffCompare<K>> &q
+        ){
     if(!es_abb_vacio(tfrec)){
         cola_desde_frecuencias(tfrec->iz, q);
         ahuff<K> h = crear_hoja(tfrec->dato.clave, tfrec->dato.valor);
@@ -101,16 +107,30 @@ template <class K> ahuff<K> ahuff_desde_frecuencias(tabla_frecuencias<K> tfrec){
     return q.top();
 }
 
-template<class K> void subtree_graphviz(std::ostream &os, std::string id, ahuff<K> a){
+codigo_h pre(codigo_h codigo, bool prefijo){
+    codigo.push_back(prefijo);
+    return codigo;
+}
+
+template <class K> void tabla_codigos(ahuff<K> a, tabla<K,codigo_h> &cods, codigo_h prefijo){
+    if(!a->es_hoja()){
+        tabla_codigos(a->hijo_iz, cods, pre(prefijo, false));
+        tabla_codigos(a->hijo_dr, cods, pre(prefijo, true));
+    } else {
+        aniadir(cods, a->clave, prefijo);
+    }
+}
+
+template <class K> void subtree_graphviz(std::ostream &os, std::string id, ahuff<K> a){
     if(a->es_hoja()){
         os << "    " << "ahuff_node" << id << " [shape=\"record\" ";
         os << "label = \"{" << a->frec << "|" << a->clave << "}\"];\n";
     }
     else{
         os << "    " << "ahuff_node" << id << " [label = \"" << a->frec << "\"];\n";
-        os << "    " << "ahuff_node" << id << " -> " << "ahuff_node" << id << "i;\n";
+        os << "    " << "ahuff_node" << id << " -> " << "ahuff_node" << id << "i [label = 0];\n";
         subtree_graphviz(os, id + "i", a->hijo_iz);
-        os << "    " << "ahuff_node" << id << " -> " << "ahuff_node" << id << "d;\n";
+        os << "    " << "ahuff_node" << id << " -> " << "ahuff_node" << id << "d [label = 1];\n";
         subtree_graphviz(os, id + "d", a->hijo_dr);
     }
 }

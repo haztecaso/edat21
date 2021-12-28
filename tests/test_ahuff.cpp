@@ -3,25 +3,16 @@
 #include "../tads/ahuff.hpp"
 
 using std::cout;
+using std::endl;
 
 typedef char K;
 int main(){
-    std::string texto = "hola caracola. pa ti mi cola";
-    /* tabla_frecuencias<K> frec = frecuencias_char(texto); */
-
-    tabla_frecuencias<K> frec = tabla_frecuencias_vacia<K>();
-    aniadir(frec, 'C', 32);
-    aniadir(frec, 'D', 42);
-    aniadir(frec, 'E', 120);
-    aniadir(frec, 'K', 7);
-    aniadir(frec, 'L', 42);
-    aniadir(frec, 'M', 24);
-    aniadir(frec, 'U', 37);
-    aniadir(frec, 'Z', 2);
-
-    cout << frec;
-
+    std::string texto = "¿Hola que tal? ¿Cómo te va la vida?";
+    tabla_frecuencias<K> frec = frecuencias_char(texto);
     ahuff<K> a = ahuff_desde_frecuencias(frec);
+    tabla<K,codigo_h> cods = tabla_vacia<K,codigo_h>();
+    tabla_codigos(a, cods, codigo_vacio());
+    cout << cods;
     ahuff_graphviz("ahuff.dot", a);
     return 0;
 }
