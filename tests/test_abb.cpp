@@ -1,8 +1,6 @@
 #include "test_utils.hpp"
 #include "../tads/abb.hpp"
 
-using namespace std;
-
 typedef int el;
 
 int main(){
