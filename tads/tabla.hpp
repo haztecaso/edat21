@@ -22,9 +22,6 @@ template <class K, class V> struct entrada {
 // Definición del tipo de las tablas (mediante árboles binarios)
 template <class K, class V> using tabla = abb<entrada<K,V>>;
 
-// Tabla de frecuencias (valores de tipo int)
-template <class K> using tabla_frecuencias = tabla<K,int>;
-
 // Excepción para ser lanzada cuando no se ha encontrado una clave en una tabla
 struct ClaveNoEncontrada: public std::exception {
     const char * what () const throw ()
@@ -46,9 +43,6 @@ template <class K, class V> std::ostream& operator<<(std::ostream& os, entrada<K
 
 // Crea una tabla vacía
 template <class K, class V> tabla<K,V> tabla_vacia();
-
-// Crea una tabla de frecuencias vacía
-template <class K> tabla_frecuencias<K> tabla_frecuencias_vacia();
 
 // Determina si una tabla está vacía
 template <class K, class V> bool es_tabla_vacia(tabla<K,V> t);
@@ -81,9 +75,6 @@ template <class K, class V> void eliminar(tabla<K,V> t, K clave);
 
 template <class K, class V> std::ostream& operator<<(std::ostream& os, tabla<K,V> t);
 
-// Devuelve una tabla de frecuencias de los caracteres de un texto.
-tabla_frecuencias<char> frecuencias_char(std::string texto);
-
 /* IMPLEMENTACIONES */
 
 template <class K, class V> bool operator<=(entrada<K,V> e1, entrada<K,V> e2){
@@ -101,10 +92,6 @@ template <class K, class V> std::ostream& operator<<(std::ostream& os, entrada<K
 
 template <class K, class V> tabla<K,V> tabla_vacia(){
     return abb_vacio<entrada<K,V>>();
-}
-
-template <class K> tabla_frecuencias<K> tabla_frecuencias_vacia(){
-    return tabla_vacia<K, int>();
 }
 
 template <class K, class V> bool es_tabla_vacia(tabla<K,V> t){
@@ -165,12 +152,4 @@ template <class K, class V> std::ostream& operator<<(std::ostream& os, tabla<K,V
     inorden(t, v);
     for(entrada<K,V> e:v) os << e << "\n";
     return os;
-}
-
-tabla_frecuencias<char> frecuencias_char(std::string texto){
-    tabla_frecuencias<char> tabla = tabla_frecuencias_vacia<char>();
-    for (char const &c: texto){
-        aniadir(tabla, c, 1);
-    }
-    return tabla;
 }

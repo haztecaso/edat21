@@ -32,5 +32,5 @@ comandos: `./bin/test_pila`.
 ### Manualmente
 
 ```
-g++ -o bin/test_pila tests/test_pila.cpp -Itads
+g++ -o bin/test_pila tests/test_pila.cpp
 ```

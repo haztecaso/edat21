@@ -12,11 +12,17 @@
 
 using codigo_h = std::vector<bool>;
 
+// Tabla de frecuencias
+template <class K> using tfrecuencias = tabla<K,int>;
+
+// Tabla de códigos
+template <class K> using tcodigos = tabla<K,codigo_h>;
+
 template <class K> struct nodo_h {
     K clave;
-    int frec;
-    nodo_h<K> * hijo_iz;
-    nodo_h<K> * hijo_dr;
+    int frec = -1;
+    nodo_h<K> * hijo_iz = nullptr;
+    nodo_h<K> * hijo_dr = nullptr;
     virtual bool es_hoja();
 };
 
@@ -36,21 +42,36 @@ template <class K> struct nodo: nodo_h<K> {
     }
 };
 
-template <class K> using ahuff = nodo_h<K>*;
+template <class K> using ahuff = nodo_h<K> *;
 
 codigo_h codigo_vacio();
 std::ostream& operator<<(std::ostream& os, codigo_h codigo);
 
+// Crea una tabla de frecuencias vacía
+template <class K> tfrecuencias<K> tfrecuencias_vacia();
+
+// Crea una tabla de códigos vacía
+template <class K> tcodigos<K> tcodigos_vacia();
+
 template <class K> ahuff<K> crear_hoja(K clave, int frec);
 template <class K> ahuff<K> plantar(ahuff<K> a1, ahuff<K> a2);
 template <class K> struct AHuffCompare;
-template <class K> ahuff<K> ahuff_desde_frecuencias(tabla_frecuencias<K> tfrec);
-template <class K> tabla<K, codigo_h> tabla_codigos(ahuff<K> a);
+template <class K> ahuff<K> ahuff_desde_frecuencias(tfrecuencias<K> tfrec);
+template <class K> void tabla_codigos(ahuff<K> a, tabla<K,codigo_h> &cods, codigo_h prefijo);
+template <class K> ahuff<K> ahuff_desde_tabla_codigos(tabla<K,codigo_h> cods);
 template <class K> void ahuff_graphviz(std::ostream &os, ahuff<K> a);
 template <class K> void ahuff_graphviz(std::string filename, ahuff<K> a);
 
 codigo_h codigo_vacio(){
     return std::vector<bool>();
+}
+
+template <class K> tfrecuencias<K> tfrecuencias_vacia(){
+    return tabla_vacia<K, int>();
+}
+
+template <class K> tcodigos<K> tcodigos_vacia(){
+    return tabla_vacia<K, codigo_h>();
 }
 
 std::ostream& operator<<(std::ostream& os, codigo_h codigo){
@@ -81,7 +102,7 @@ template <class K> struct AHuffCompare {
 // de frecuencias.
 template <class K>
 void cola_desde_frecuencias(
-        tabla_frecuencias<K> tfrec,
+        tfrecuencias<K> tfrec,
         std::priority_queue<ahuff<K>,std::vector<ahuff<K>>, AHuffCompare<K>> &q
         ){
     if(!es_abb_vacio(tfrec)){
@@ -92,7 +113,7 @@ void cola_desde_frecuencias(
     }
 }
 
-template <class K> ahuff<K> ahuff_desde_frecuencias(tabla_frecuencias<K> tfrec){
+template <class K> ahuff<K> ahuff_desde_frecuencias(tfrecuencias<K> tfrec){
     std::priority_queue<ahuff<K>,std::vector<ahuff<K>>, AHuffCompare<K>> q;
     cola_desde_frecuencias(tfrec, q);
     ahuff<K> a, b, c;
@@ -121,6 +142,36 @@ template <class K> void tabla_codigos(ahuff<K> a, tabla<K,codigo_h> &cods, codig
     }
 }
 
+template <class K> ahuff<K> ahuff_desde_tabla_codigos(tabla<K,codigo_h> cods){
+    using ecod = entrada<char, codigo_h>;
+    std::vector<ecod> v = std::vector<ecod>();
+    inorden(cods, v);
+    ahuff<K> result = new nodo<K>;
+    for(ecod e:v){
+        long unsigned int pos = 0;
+        ahuff<K> actual = result;
+        for(bool b: e.valor){
+            pos++;
+            ahuff<K> &siguiente = b ? actual->hijo_dr : actual->hijo_iz;
+            if(siguiente == nullptr){
+                if(pos == e.valor.size()){
+                    siguiente = crear_hoja(e.clave, -1);
+                } else {
+                    siguiente = new nodo<K>;
+                    actual = siguiente;
+                }
+            }
+            else if(!siguiente->es_hoja()){
+                actual = siguiente;
+            }
+            else{
+                throw std::runtime_error("ERROR: Dos claves no pueden tener el mismo códigstringstream s descomprimir(datoso");
+            }
+        }
+    }
+    return result;
+    }
+
 template <class K> void subtree_graphviz(std::ostream &os, std::string id, ahuff<K> a){
     if(a->es_hoja()){
         os << "    " << "ahuff_node" << id << " [shape=\"record\" ";
@@ -129,9 +180,9 @@ template <class K> void subtree_graphviz(std::ostream &os, std::string id, ahuff
     else{
         os << "    " << "ahuff_node" << id << " [label = \"" << a->frec << "\"];\n";
         os << "    " << "ahuff_node" << id << " -> " << "ahuff_node" << id << "i [label = 0];\n";
-        subtree_graphviz(os, id + "i", a->hijo_iz);
+        if(a->hijo_iz != nullptr) subtree_graphviz(os, id + "i", a->hijo_iz);
         os << "    " << "ahuff_node" << id << " -> " << "ahuff_node" << id << "d [label = 1];\n";
-        subtree_graphviz(os, id + "d", a->hijo_dr);
+        if(a->hijo_dr != nullptr) subtree_graphviz(os, id + "d", a->hijo_dr);
     }
 }
 

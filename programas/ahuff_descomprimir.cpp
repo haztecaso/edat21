@@ -1,9 +1,10 @@
-#include<vector>
-#include<iostream>
-#include<string>
-#include<fstream>
-#include<limits.h>
-#include<random>
+#include <fstream>
+#include <iostream>
+#include <limits.h>
+#include <random>
+#include <sstream>
+#include <string>
+#include <vector>
 #include "../tads/tabla.hpp"
 #include "../tads/ahuff.hpp"
 
@@ -27,8 +28,8 @@ tabla<char, codigo_h> leer_tabla_codigos(ifstream &f){
         }
         while(f.get(c)){
             if(c == ';') break;
-            else if( c == '1') e.valor.insert(e.valor.begin(), true);
-            else if( c == '0') e.valor.insert(e.valor.begin(), false);
+            else if( c == '1') e.valor.push_back(true);
+            else if( c == '0') e.valor.push_back(false);
             else throw runtime_error("Error al descodificar una entrada: se esperaba un 0,1 o ;");
         }
         aniadir(t, e);
@@ -40,9 +41,7 @@ vector<bool> leer_datos(ifstream &f){
     long num_bits;
     vector<bool> result;
     f >> num_bits;
-    char c;
-    f.get(c);
-    if(c!=';') throw runtime_error("Error al leer los datos: se esperaba un ';' después del entero con la longitud de los datos");
+    unsigned char c;
     string s;
     getline(f,s); 
     long pos = 0;
@@ -63,6 +62,22 @@ vector<bool> leer_datos(ifstream &f){
     return result; 
 }
 
+stringstream descomprimir(vector<bool> datos, ahuff<char> a){
+    stringstream s;
+    ahuff<char> actual = a;
+    for(long unsigned int i = 0; i< datos.size(); i++){
+        if(actual->es_hoja()){
+            s << actual->clave;
+            actual = a;
+            i--;
+        }
+        else{
+            actual = datos[i] ? actual->hijo_dr : actual->hijo_iz;
+        }
+    }
+    return s;
+}
+
 int main(int argc, char** argv){
     if(argc != 2){
         std::cout << "Error: este programa requiere exactamente un parámetro, la dirección del fichero a descomprimir." << endl;
@@ -74,10 +89,17 @@ int main(int argc, char** argv){
     cout << "- Leyendo tabla de códigos" << endl;
     tabla<char, codigo_h> tabla_codigos = leer_tabla_codigos(f);
 
+    cout << "- Leyendo datos" << endl;
     vector<bool> datos = leer_datos(f);
 
-    cout << tabla_codigos;
-    cout << datos;
+    cout << "- Construyendo árbol de Huffman a partir de la tabla de códigos" << endl;
+    ahuff<char> a = ahuff_desde_tabla_codigos(tabla_codigos);
+    ahuff_graphviz("ahuff_descompresion.dot", a);
+
+    cout << "- Descomprimiendo los datos a partir del árbol de Huffman" << endl;
+    stringstream texto = descomprimir(datos, a);
+
+    cout << texto.str();
 
     return 0;
 }  

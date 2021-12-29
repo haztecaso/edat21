@@ -1,17 +1,17 @@
 #include <fstream>
 #include <iostream>
-#include <sstream>
 #include <limits.h>
+#include <sstream>
 #include <vector>
 #include "../tads/tabla.hpp"
 #include "../tads/ahuff.hpp"
 
 using namespace std;
 
-tabla_frecuencias<char> construir_tabla_frecuencias(ifstream &f){
+tfrecuencias<char> construir_tabla_frecuencias(ifstream &f){
     f.clear();
     f.seekg(0, f.beg);
-    tabla_frecuencias<char> tabla = tabla_frecuencias_vacia<char>();
+    tfrecuencias<char> tabla = tfrecuencias_vacia<char>();
     for (char c; f.get(c);) aniadir(tabla, c, 1);
     return tabla;
 }
@@ -31,9 +31,12 @@ vector<bool> comprimir(tabla<char,codigo_h> cods, ifstream &f){
     f.clear();
     f.seekg(0, f.beg);
     vector<bool> datos = vector<bool>();
+
+    // TODO: Optimizar
     for (char c; f.get(c);){
-        for(bool b:consultar(cods,c)){
-            datos.push_back(b);
+        codigo_h codigo = consultar(cods, c);
+        for(bool b:codigo){
+            datos.push_back(b); 
         }
     }
     return datos;
@@ -44,7 +47,7 @@ stringstream optimizar_codigo(vector<bool> codigo){
     long num_bits = codigo.size();
     unsigned char c;
     long inic;
-    s << num_bits << ";";
+    s << num_bits << "\n";
     for(int i = 0; i < num_bits/CHAR_BIT; i++){
         c = 0;
         inic = i*CHAR_BIT;
@@ -71,7 +74,7 @@ int main(int argc, char** argv){
     ifstream f = ifstream(filename);
 
     cout << "- Generando tabla de frecuencias" << endl;
-    tabla_frecuencias<char> frecs = construir_tabla_frecuencias(f);
+    tfrecuencias<char> frecs = construir_tabla_frecuencias(f);
 
     cout << "- Generando Árbol de Huffman" << endl;
     ahuff<char> a = ahuff_desde_frecuencias(frecs);
@@ -83,14 +86,13 @@ int main(int argc, char** argv){
     ahuff_graphviz("ahuff.dot", a);
 
     cout << "- Generando tabla de códigos de Huffman" << endl;
-    tabla<char,codigo_h> cods = tabla_vacia<char,codigo_h>();
+    tcodigos<char> cods = tcodigos_vacia<char>();
     tabla_codigos(a, cods, codigo_vacio());
 
     cout << "- Comprimiendo fichero y codificando tabla de códigos" << endl;
     stringstream codigos_codificados = codificar_tabla(cods);
     vector<bool> codigo = comprimir(cods, f);
     stringstream datos = optimizar_codigo(codigo);
-
 
     string ofilename = filename + ".huff";
     cout << "- Guardando fichero comprimido en " << ofilename << endl;
