@@ -14,7 +14,11 @@
 #include <vector>
 #include "basicos.hpp"
 
+/* STRUCTS Y TIPOS */
+
 template<class T> using abb = nodo_doble<T> *;
+
+/* CABECERAS (SIGNATURAS) */
 
 // Función para crear un abb vacío
 template<class T> abb<T> abb_vacio();
@@ -35,13 +39,12 @@ template<class T> void eliminar(abb<T> &a, T e);
 // segundo parámetro.
 template<class T> void inorden(abb<T> a, std::vector<T> &result);
 
+
+// Funciones para generar gráficos de los ABB's
 template<class T> void abb_graphviz(std::ostream &os, abb<T> a);
 template<class T> void abb_graphviz(std::string filename, abb<T> a);
 
-
-/*
- * IMPLEMENTACIONES
- */
+/* IMPLEMENTACIONES */
 
 template<class T> abb<T> abb_vacio(){
     return (abb<T>) nullptr;

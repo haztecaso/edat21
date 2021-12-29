@@ -8,16 +8,31 @@
 
 using namespace std;
 
+/* CABECERAS (signaturas) */
+
+// Construir una tabla de frecuencias a partir de los caracteres de un fichero
 tfrecuencias<char> construir_tabla_frecuencias(ifstream &f);
+// Codifica una tabla de códigos para poder guardarla en un fichero
 stringstream codificar_tabla(tabla<char,codigo_h> tabla_codigos);
+// Reemplaza los caracteres del fichero por una concatenación de codigos de huffman, dada la tabla de caracteres.
 vector<bool> codificar_fichero(tabla<char,codigo_h> tabla_codigos, ifstream &f);
+// Optimiza el espacio que ocupan los datos (un vector de booleanos) para que el fichero resultante ocupe menos espacio
 stringstream optimizar_datos(vector<bool> datos);
+// Comprime un fichero y guarda el resultado en otro fichero con el mismo
+// nombre pero acabado en ".huff"
 void comprimir(string filename);
 
+// Lee y decodifica la tabla de codigos de un fichero comprimido
 tabla<char, codigo_h> leer_tabla_codigos(ifstream &f);
+// Lee los datos comprimidos de un fichero, decodificandolos en un vector de booleanos
 vector<bool> leer_datos(ifstream &f);
-stringstream decodificar_datos(vector<bool> datos, ahuff<char> a);
+// Descomprime un vector de booleanos, dado un ahuff con las codificaciones de los caracteres
+stringstream descomprimir_datos(vector<bool> datos, ahuff<char> a);
+// Descomprime un fichero y guarda el resultado en otro fichero con el mismo
+// nombre pero acabado en ".txt"
 void descomprimir(string filename);
+
+/* IMPLEMENTACIONES */
 
 int main(int argc, char** argv){
     if(argc != 3){
@@ -41,58 +56,6 @@ int main(int argc, char** argv){
     }
 
     return 0;
-}
-
-tfrecuencias<char> construir_tabla_frecuencias(ifstream &f){
-    f.clear();
-    f.seekg(0, f.beg);
-    tfrecuencias<char> tabla = tfrecuencias_vacia<char>();
-    for (char c; f.get(c);) aniadir(tabla, c, 1);
-    return tabla;
-}
-
-using ecod = entrada<char, codigo_h>;
-
-stringstream codificar_tabla(tabla<char,codigo_h> tabla_codigos){
-    stringstream s;
-    vector<ecod> v = vector<ecod>();
-    inorden(tabla_codigos, v);
-    for (ecod e: v) s << e.clave << ":" << e.valor << ";";
-    s << ";;";
-    return s;
-}
-
-vector<bool> codificar_fichero(tabla<char,codigo_h> tabla_codigos, ifstream &f){
-    f.clear();
-    f.seekg(0, f.beg);
-    vector<bool> datos = vector<bool>();
-
-    // TODO: Optimizar
-    for (char c; f.get(c);){
-        for(bool b:consultar(tabla_codigos,c)) datos.push_back(b); 
-    }
-    return datos;
-}
-
-stringstream optimizar_datos(vector<bool> datos){
-    stringstream s;
-    long num_bits = datos.size();
-    unsigned char c;
-    long inic;
-    s << num_bits << "\n";
-    for(int i = 0; i < num_bits/CHAR_BIT; i++){
-        c = 0;
-        inic = i*CHAR_BIT;
-        for(int j = CHAR_BIT-1; j>=0; j--) c = c*2+datos[inic+j];
-        s<<c;
-    }
-    c = 0;
-    inic = (num_bits/CHAR_BIT)*CHAR_BIT;
-    for(int j = num_bits%CHAR_BIT-1;j>=0;j--){
-        c = c *2 + datos[inic + j];
-    }
-    s << c;
-    return s;
 }
 
 void comprimir(string filename){
@@ -123,6 +86,80 @@ void comprimir(string filename){
     ofstream of = ofstream(ofilename);
     of << codigos_codificados.rdbuf();
     of << datos_optim.rdbuf();
+}
+
+void descomprimir(string filename){
+    ifstream f = ifstream(filename);
+
+    // Leyendo tabla de códigos
+    tabla<char, codigo_h> tabla_codigos = leer_tabla_codigos(f);
+
+    // Leyendo datos
+    vector<bool> datos = leer_datos(f);
+
+    // Construyendo árbol de Huffman a partir de la tabla de códigos
+    ahuff<char> a = ahuff_desde_tabla_codigos(tabla_codigos);
+    ahuff_graphviz("ahuff_descompresion.dot", a);
+
+    // Descomprimiendo los datos a partir del árbol de Huffman
+    stringstream texto = descomprimir_datos(datos, a);
+
+    // Guardando fichero descomprimido
+    string ofilename = filename + ".txt";
+    ofstream of = ofstream(ofilename);
+    of << texto.rdbuf();
+}
+
+tfrecuencias<char> construir_tabla_frecuencias(ifstream &f){
+    f.clear();
+    f.seekg(0, f.beg);
+    tfrecuencias<char> tabla = tfrecuencias_vacia<char>();
+    for (char c; f.get(c);) aniadir(tabla, c, 1);
+    return tabla;
+}
+
+using ecod = entrada<char, codigo_h>;
+
+stringstream codificar_tabla(tabla<char,codigo_h> tabla_codigos){
+    stringstream s;
+    vector<ecod> v = vector<ecod>();
+    inorden(tabla_codigos, v);
+    for (ecod e: v) s << e.clave << ":" << e.valor << ";";
+    s << ";;";
+    return s;
+}
+
+vector<bool> codificar_fichero(tabla<char,codigo_h> tabla_codigos, ifstream &f){
+    f.clear();
+    f.seekg(0, f.beg);
+    vector<bool> datos = vector<bool>();
+
+    // TODO: Optimizar
+    for (char c; f.get(c);){
+        for(bool b:consultar(tabla_codigos,c)) datos.push_back(b);
+    }
+    return datos;
+}
+
+stringstream optimizar_datos(vector<bool> datos){
+    stringstream s;
+    long num_bits = datos.size();
+    unsigned char c;
+    long inic;
+    s << num_bits << "\n";
+    for(int i = 0; i < num_bits/CHAR_BIT; i++){
+        c = 0;
+        inic = i*CHAR_BIT;
+        for(int j = CHAR_BIT-1; j>=0; j--) c = c*2+datos[inic+j];
+        s<<c;
+    }
+    c = 0;
+    inic = (num_bits/CHAR_BIT)*CHAR_BIT;
+    for(int j = num_bits%CHAR_BIT-1;j>=0;j--){
+        c = c *2 + datos[inic + j];
+    }
+    s << c;
+    return s;
 }
 
 tabla<char, codigo_h> leer_tabla_codigos(ifstream &f){
@@ -158,7 +195,7 @@ vector<bool> leer_datos(ifstream &f){
     f >> num_bits;
     unsigned char c;
     string s;
-    getline(f,s); 
+    getline(f,s);
     long pos = 0;
     for(long i =0; i<num_bits/CHAR_BIT; i++){
          c = f.get();
@@ -174,10 +211,10 @@ vector<bool> leer_datos(ifstream &f){
         c = c/2;
     }
     f.close();
-    return result; 
+    return result;
 }
 
-stringstream decodificar_datos(vector<bool> datos, ahuff<char> a){
+stringstream descomprimir_datos(vector<bool> datos, ahuff<char> a){
     stringstream s;
     ahuff<char> actual = a;
     for(long unsigned int i = 0; i< datos.size(); i++){
@@ -193,24 +230,3 @@ stringstream decodificar_datos(vector<bool> datos, ahuff<char> a){
     return s;
 }
 
-void descomprimir(string filename){
-    ifstream f = ifstream(filename);
-
-    // Leyendo tabla de códigos
-    tabla<char, codigo_h> tabla_codigos = leer_tabla_codigos(f);
-
-    // Leyendo datos
-    vector<bool> datos = leer_datos(f);
-
-    // Construyendo árbol de Huffman a partir de la tabla de códigos
-    ahuff<char> a = ahuff_desde_tabla_codigos(tabla_codigos);
-    ahuff_graphviz("ahuff_descompresion.dot", a);
-
-    // Descomprimiendo los datos a partir del árbol de Huffman
-    stringstream texto = decodificar_datos(datos, a);
-
-    // Guardando fichero descomprimido
-    string ofilename = filename + ".txt";
-    ofstream of = ofstream(ofilename);
-    of << texto.rdbuf();
-}
