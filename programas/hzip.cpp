@@ -2,6 +2,7 @@
 #include <iostream>
 #include <limits.h>
 #include <sstream>
+#include <stdlib.h>
 #include <vector>
 #include "../tads/tabla.hpp"
 #include "../tads/ahuff.hpp"
@@ -34,24 +35,29 @@ void descomprimir(string filename);
 
 /* IMPLEMENTACIONES */
 
+const char * mensaje_uso = 
+            "Uso:\n"
+            "  hzip <modo> <fichero>\n"
+            "Parámetros:\n"
+            "  modo = \"c\" | \"d\"    comprimir o descomprimir\n"
+            "  fichero             ruta del fichero que se va a procesar\n";
+
 int main(int argc, char** argv){
     if(argc != 3){
-        // TODO: USAGE
-        std::cout << "Error: este programa requiere exactamente dos parámetros" << endl;
+        std::cout << mensaje_uso << endl;
         return 1;
     }
 
-    string cmd = string(argv[1]);
+    string modo = string(argv[1]);
     string filename = string(argv[2]);
 
-    if(cmd == "c" || cmd == "cmp" || cmd == "comprimir"){
-        comprimir(filename);
-    } else if(cmd == "d" || cmd == "des" || cmd == "descomprimir"){
-        descomprimir(filename);
-    }
+    if(modo == "c") comprimir(filename);
+    else if(modo == "d") descomprimir(filename);
     else {
-        // TODO: Error message
-        std::cout << "ERROR" << endl;
+        std::cout <<
+            "ERROR: ¡modo incorrecto!\n"
+            "El modo debe ser \"c\" (comprimir) o \"d\" (descomprimir), pero se ha"
+            "recibido \"" << modo << "\".\n\n" << mensaje_uso << endl;
         return 1;
     }
 
@@ -171,18 +177,19 @@ tabla<char, codigo_h> leer_tabla_codigos(ifstream &f){
         f.get(c);
         if (e.clave == ';' and c == ';') break;
         else if (c != ':'){
-            string error_msg = "Error al descodificar una entrada: se esperaba";
-            error_msg += "el caracter ':' como separador o la secuencia \";;\"";
-            error_msg += "como indicador del final de la tabla de códigos\n";
-            error_msg += "Obtenido: clave = "+ string(1, e.clave);
-            error_msg += ", separador = " + string(1, c);
+            string error_msg = "Error al descodificar la tabla de codigos: se"
+                "esperaba el caracter ':' como separador o la secuencia \";;\""
+                "como indicador del final de la tabla de códigos\n"
+                "Obtenido: clave = " + string(1, e.clave) + ", separador = "
+                + string(1, c);
             throw runtime_error(error_msg);
         }
         while(f.get(c)){
             if(c == ';') break;
             else if( c == '1') e.valor.push_back(true);
             else if( c == '0') e.valor.push_back(false);
-            else throw runtime_error("Error al descodificar una entrada: se esperaba un 0,1 o ;");
+            else throw runtime_error("Error al descodificar la tabla de codigos"
+                    ": se esperaba un '0','1' o ';'");
         }
         aniadir(t, e);
     }
