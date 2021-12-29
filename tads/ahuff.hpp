@@ -10,14 +10,12 @@
 #include <vector>
 #include <queue>
 
+/* STRUCTS Y TIPOS */
+
+// Código de Huffman: secuencia de booleanos
 using codigo_h = std::vector<bool>;
 
-// Tabla de frecuencias
-template <class K> using tfrecuencias = tabla<K,int>;
-
-// Tabla de códigos
-template <class K> using tcodigos = tabla<K,codigo_h>;
-
+// Tipo base para nodos de árboles Huffman
 template <class K> struct nodo_h {
     K clave;
     int frec = -1;
@@ -26,26 +24,67 @@ template <class K> struct nodo_h {
     virtual bool es_hoja();
 };
 
+// Tipo para las hojas de árboles Huffman
+// - Implementa el método virtual es_hoja
 template <class K> struct hoja: nodo_h<K> {
     bool es_hoja() {
         return true;
     }
-    hoja<K>(K c, int f){
-        this->clave = c;
-        this->frec = f;
-    }
 };
 
+// Tipo para los nodos de árboles Huffman
+// - Implementa el método virtual es_hoja
 template <class K> struct nodo: nodo_h<K> {
     bool es_hoja() {
         return false;
     }
 };
 
+// Tipo para los árboles Huffman
 template <class K> using ahuff = nodo_h<K> *;
 
+// Estructura para comparar ahuffs y poder usar colas de prioridad de árboles Huffman.
+template <class K> struct AHuffCompare;
+
+// Tabla de frecuencias
+template <class K> using tfrecuencias = tabla<K,int>;
+
+// Tabla de códigos
+template <class K> using tcodigos = tabla<K,codigo_h>;
+
+
+/* CABECERAS (SIGNATURAS) */
+
+// OPERACIONES DE CÓDIGOS HUFFMAN
+
+// Crea un código vacío
 codigo_h codigo_vacio();
+
+// Sobrecarga del operador << para imprimir códigos
 std::ostream& operator<<(std::ostream& os, codigo_h codigo);
+
+// OPERACIONES DE ÁRBOLES HUFFMAN
+
+// Crea una hoja dadas una clave y una frecuencia
+template <class K> hoja<K>* crear_hoja(K clave, int frec);
+
+// Planta dos ahuffs (la frecuencia es la suma de las frecuencias)
+template <class K> nodo<K>* plantar(ahuff<K> a1, ahuff<K> a2);
+
+// Genera un ahuff a partir de una tabla de frecuencias
+template <class K> ahuff<K> ahuff_desde_frecuencias(tfrecuencias<K> tfrec);
+
+// Genera la tabla de códigos correspondiente a un ahuff
+template <class K> void crear_tabla_codigos(ahuff<K> a, tabla<K,codigo_h> &cods, codigo_h prefijo);
+
+// Genera un ahuff (parcial, con todas las frecuencias iguales a -1) a partir de una tabla de códigos 
+template <class K> ahuff<K> ahuff_desde_tabla_codigos(tabla<K,codigo_h> cods);
+
+// Funciones para generar gráficos de los ahuffs
+template <class K> void ahuff_graphviz(std::ostream &os, ahuff<K> a);
+template <class K> void ahuff_graphviz(std::string filename, ahuff<K> a);
+
+// OPERACIONES DE TABLAS DE FRECUENCIAS Y CÓDIGOS
 
 // Crea una tabla de frecuencias vacía
 template <class K> tfrecuencias<K> tfrecuencias_vacia();
@@ -53,14 +92,7 @@ template <class K> tfrecuencias<K> tfrecuencias_vacia();
 // Crea una tabla de códigos vacía
 template <class K> tcodigos<K> tcodigos_vacia();
 
-template <class K> ahuff<K> crear_hoja(K clave, int frec);
-template <class K> ahuff<K> plantar(ahuff<K> a1, ahuff<K> a2);
-template <class K> struct AHuffCompare;
-template <class K> ahuff<K> ahuff_desde_frecuencias(tfrecuencias<K> tfrec);
-template <class K> void crear_tabla_codigos(ahuff<K> a, tabla<K,codigo_h> &cods, codigo_h prefijo);
-template <class K> ahuff<K> ahuff_desde_tabla_codigos(tabla<K,codigo_h> cods);
-template <class K> void ahuff_graphviz(std::ostream &os, ahuff<K> a);
-template <class K> void ahuff_graphviz(std::string filename, ahuff<K> a);
+/* IMPLEMENTACIONES */
 
 codigo_h codigo_vacio(){
     return std::vector<bool>();
@@ -79,16 +111,19 @@ std::ostream& operator<<(std::ostream& os, codigo_h codigo){
     return os;
 }
 
-template <class K> ahuff<K> crear_hoja(K clave, int frec){
-    return new hoja<K>(clave, frec);
+template <class K> hoja<K>* crear_hoja(K clave, int frec){
+    hoja<K>* h = new hoja<K>;
+    h->clave = clave;
+    h->frec = frec;
+    return h;
 }
 
-template <class K> ahuff<K> plantar(ahuff<K> hijo_iz, ahuff<K> hijo_dr){
-    ahuff<K> a = new nodo<K>;
-    a->hijo_iz = hijo_iz;
-    a->hijo_dr = hijo_dr;
-    a->frec = hijo_dr->frec + hijo_iz->frec;
-    return a;
+template <class K> nodo<K>* plantar(ahuff<K> hijo_iz, ahuff<K> hijo_dr){
+    nodo<K>* n = new nodo<K>;
+    n->hijo_iz = hijo_iz;
+    n->hijo_dr = hijo_dr;
+    n->frec = hijo_dr->frec + hijo_iz->frec;
+    return n;
 }
 
 template <class K> struct AHuffCompare {
@@ -128,17 +163,18 @@ template <class K> ahuff<K> ahuff_desde_frecuencias(tfrecuencias<K> tfrec){
     return q.top();
 }
 
-codigo_h pre(codigo_h codigo, bool prefijo){
+// Función auxiliar: añade un prefijo a un codigo_h
+codigo_h prefijar(codigo_h codigo, bool prefijo){
     codigo.push_back(prefijo);
     return codigo;
 }
 
-template <class K> void crear_tabla_codigos(ahuff<K> a, tabla<K,codigo_h> &cods, codigo_h prefijo){
+template <class K> void crear_tabla_codigos(ahuff<K> a, tabla<K,codigo_h> &cods, codigo_h codigo){
     if(!a->es_hoja()){
-        crear_tabla_codigos(a->hijo_iz, cods, pre(prefijo, false));
-        crear_tabla_codigos(a->hijo_dr, cods, pre(prefijo, true));
+        crear_tabla_codigos(a->hijo_iz, cods, prefijar(codigo, false));
+        crear_tabla_codigos(a->hijo_dr, cods, prefijar(codigo, true));
     } else {
-        aniadir(cods, a->clave, prefijo);
+        aniadir(cods, a->clave, codigo);
     }
 }
 
@@ -150,16 +186,16 @@ template <class K> ahuff<K> ahuff_desde_tabla_codigos(tabla<K,codigo_h> cods){
     for(ecod e:v){
         long unsigned int pos = 0;
         ahuff<K> actual = result;
+        // TODO: Hacer más legible este boocle
         for(bool b: e.valor){
             pos++;
             ahuff<K> &siguiente = b ? actual->hijo_dr : actual->hijo_iz;
             if(siguiente == nullptr){
-                if(pos == e.valor.size()){
+                if(pos == e.valor.size())
                     siguiente = crear_hoja(e.clave, -1);
-                } else {
+                else
                     siguiente = new nodo<K>;
-                    actual = siguiente;
-                }
+                actual = siguiente;
             }
             else if(!siguiente->es_hoja()){
                 actual = siguiente;
@@ -172,6 +208,7 @@ template <class K> ahuff<K> ahuff_desde_tabla_codigos(tabla<K,codigo_h> cods){
     return result;
     }
 
+// Función recursiva auxiliar que genera la parte interna del código .dot de un ahuff
 template <class K> void subtree_graphviz(std::ostream &os, std::string id, ahuff<K> a){
     if(a->es_hoja()){
         os << "    " << "ahuff_node" << id << " [shape=\"record\" ";
