@@ -57,7 +57,7 @@ template <class K> ahuff<K> crear_hoja(K clave, int frec);
 template <class K> ahuff<K> plantar(ahuff<K> a1, ahuff<K> a2);
 template <class K> struct AHuffCompare;
 template <class K> ahuff<K> ahuff_desde_frecuencias(tfrecuencias<K> tfrec);
-template <class K> void tabla_codigos(ahuff<K> a, tabla<K,codigo_h> &cods, codigo_h prefijo);
+template <class K> void crear_tabla_codigos(ahuff<K> a, tabla<K,codigo_h> &cods, codigo_h prefijo);
 template <class K> ahuff<K> ahuff_desde_tabla_codigos(tabla<K,codigo_h> cods);
 template <class K> void ahuff_graphviz(std::ostream &os, ahuff<K> a);
 template <class K> void ahuff_graphviz(std::string filename, ahuff<K> a);
@@ -133,10 +133,10 @@ codigo_h pre(codigo_h codigo, bool prefijo){
     return codigo;
 }
 
-template <class K> void tabla_codigos(ahuff<K> a, tabla<K,codigo_h> &cods, codigo_h prefijo){
+template <class K> void crear_tabla_codigos(ahuff<K> a, tabla<K,codigo_h> &cods, codigo_h prefijo){
     if(!a->es_hoja()){
-        tabla_codigos(a->hijo_iz, cods, pre(prefijo, false));
-        tabla_codigos(a->hijo_dr, cods, pre(prefijo, true));
+        crear_tabla_codigos(a->hijo_iz, cods, pre(prefijo, false));
+        crear_tabla_codigos(a->hijo_dr, cods, pre(prefijo, true));
     } else {
         aniadir(cods, a->clave, prefijo);
     }
