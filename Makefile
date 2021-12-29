@@ -5,7 +5,7 @@ OUT = bin
 TESTS = test_pila test_pila_static test_cola test_cola_static test_lista\
 		test_abb test_tabla test_ahuff
 PROGRAMAS = calculadora parentesis_equilibrados pilas_de_pilas abb_diagrama\
-			quicksort_secuencia ahuff_comprimir ahuff_descomprimir
+			quicksort_secuencia hzip
 
 build: tests programas
 
