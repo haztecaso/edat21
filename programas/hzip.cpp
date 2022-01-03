@@ -31,14 +31,14 @@ vector<bool> desempaquetar_bits(istream &e);
 tfrecuencias<char> construir_tabla_frecuencias(istream &e);
 
 // Codifica una tabla de códigos para poder guardarla en un fichero
-void codificar_tabla(tabla<char,codigo_h> tabla_codigos, ostream &salida);
+void codificar_tabla(tcodigos<char> abla_codigos, ostream &salida);
 
 // Lee y decodifica la tabla de codigos de un fichero comprimido
-tabla<char, codigo_h> leer_tabla_codigos(istream &es);
+tcodigos<char> leer_tabla_codigos(istream &es);
 
 // Reemplaza los caracteres de un istream por una concatenación de codigos de
 // huffman, dada la tabla de codigos correspondiente a los datos.
-vector<bool> codificar_datos(istream &e, tabla<char,codigo_h> tabla_codigos);
+vector<bool> codificar_datos(istream &e, tcodigos<char> tabla_codigos);
 
 // Descomprime un vector de booleanos, dado un ahuff con las codificaciones de los caracteres
 void descomprimir_datos(vector<bool> datos, ahuff<char> a, ostream &salida);
@@ -159,7 +159,7 @@ void comprimir(istream &entrada, ostream &salida){
 void descomprimir(istream &entrada, ostream &salida){
 
     // Leyendo tabla de códigos
-    tabla<char, codigo_h> tabla_codigos = leer_tabla_codigos(entrada);
+    tcodigos<char> tabla_codigos = leer_tabla_codigos(entrada);
 
     // Leyendo datos
     vector<bool> datos = desempaquetar_bits(entrada);
@@ -182,14 +182,14 @@ tfrecuencias<char> construir_tabla_frecuencias(istream &e){
 
 using ecod = entrada<char, codigo_h>;
 
-void codificar_tabla(tabla<char,codigo_h> tabla_codigos, ostream &salida){
+void codificar_tabla(tcodigos<char> tabla_codigos, ostream &salida){
     vector<ecod> v = vector<ecod>();
     inorden(tabla_codigos, v);
     for (ecod e: v) salida << e.clave << ":" << e.valor << ";";
     salida << ";;";
 }
 
-vector<bool> codificar_datos(istream &e, tabla<char,codigo_h> tabla_codigos){
+vector<bool> codificar_datos(istream &e, tcodigos<char> tabla_codigos){
     e.clear();
     e.seekg(0, e.beg);
     vector<bool> datos = vector<bool>();
@@ -220,8 +220,8 @@ void empaquetar_bits(vector<bool> datos, ostream &salida){
     salida << c;
 }
 
-tabla<char, codigo_h> leer_tabla_codigos(istream &es){
-    tabla<char, codigo_h> t = tabla_vacia<char,codigo_h>();
+tcodigos<char> leer_tabla_codigos(istream &es){
+    tcodigos<char> t = tcodigos_vacia<char>();
     while(true){
         entrada<char, codigo_h> e;
         es.get(e.clave);
