@@ -191,17 +191,18 @@ template <class K> ahuff<K> ahuff_desde_tabla_codigos(tabla<K,codigo_h> cods){
             pos++;
             ahuff<K> &siguiente = b ? actual->hijo_dr : actual->hijo_iz;
             if(siguiente == nullptr){
-                if(pos == e.valor.size())
+                if(pos == e.valor.size()){
                     siguiente = crear_hoja(e.clave, -1);
-                else
+                } else {
                     siguiente = new nodo<K>;
+                }
                 actual = siguiente;
             }
             else if(!siguiente->es_hoja()){
                 actual = siguiente;
             }
             else{
-                throw std::runtime_error("ERROR: Dos claves no pueden tener el mismo códigstringstream s descomprimir(datoso");
+                throw std::runtime_error("ERROR: Dos claves no pueden tener el mismo código");
             }
         }
     }
