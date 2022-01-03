@@ -27,6 +27,9 @@ void empaquetar_bits(vector<bool> datos, ostream &salida);
 // Función inversa de empaquetar_bits
 vector<bool> desempaquetar_bits(istream &e);
 
+// Función inversa de empaquetar_bits
+codigo_h desempaquetar_codigo(istream &e, tcodigos<char> tabla_codigos);
+
 // Construir una tabla de frecuencias a partir de un istream
 tfrecuencias<char> construir_tabla_frecuencias(istream &e);
 
@@ -144,7 +147,7 @@ void comprimir(istream &entrada, ostream &salida){
     // Guarda el árbol de huffman en formato .dot. Muy útil para debuguear el
     // código. Para compilar el gráfico hay que ejecutar el siguiente comando
     // (del paquete graphviz): dot -Tpng -O ahuff.dot
-    ahuff_graphviz("ahuff.dot", a);
+    // ahuff_graphviz("ahuff.dot", a);
 
     // Generando tabla de códigos de Huffman
     tcodigos<char> tabla_codigos = tcodigos_vacia<char>();
@@ -161,12 +164,12 @@ void descomprimir(istream &entrada, ostream &salida){
     // Leyendo tabla de códigos
     tcodigos<char> tabla_codigos = leer_tabla_codigos(entrada);
 
-    // Leyendo datos
-    vector<bool> datos = desempaquetar_bits(entrada);
-
     // Construyendo árbol de Huffman a partir de la tabla de códigos
     ahuff<char> a = ahuff_desde_tabla_codigos(tabla_codigos);
-    ahuff_graphviz("ahuff_descompresion.dot", a);
+    // ahuff_graphviz("ahuff_descompresion.dot", a); // ÚTIL PARA DEBUGUEAR
+
+    // Leyendo datos
+    vector<bool> datos = desempaquetar_bits(entrada);
 
     // Descomprimiendo los datos a partir del árbol de Huffman
     descomprimir_datos(datos, a, salida);
