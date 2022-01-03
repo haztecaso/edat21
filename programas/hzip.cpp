@@ -21,24 +21,24 @@ void comprimir(istream &entrada, ostream &salida);
 // TODO: Soportar cin para la entrada
 void descomprimir(istream &entrada, ostream &salida);
 
-// Construir una tabla de frecuencias a partir de un istream
-tfrecuencias<char> construir_tabla_frecuencias(istream &e);
-
-// Reemplaza los caracteres de un istream por una concatenación de codigos de
-// huffman, dada la tabla de codigos correspondiente a los datos.
-vector<bool> codificar_datos(istream &e, tabla<char,codigo_h> tabla_codigos);
-
 // Escribe optimamente una secuencia de bits (de tipo vector<bool>) en un ostream
 void empaquetar_bits(vector<bool> datos, ostream &salida);
 
 // Función inversa de empaquetar_bits
 vector<bool> desempaquetar_bits(istream &e);
 
+// Construir una tabla de frecuencias a partir de un istream
+tfrecuencias<char> construir_tabla_frecuencias(istream &e);
+
 // Codifica una tabla de códigos para poder guardarla en un fichero
 void codificar_tabla(tabla<char,codigo_h> tabla_codigos, ostream &salida);
 
 // Lee y decodifica la tabla de codigos de un fichero comprimido
 tabla<char, codigo_h> leer_tabla_codigos(istream &es);
+
+// Reemplaza los caracteres de un istream por una concatenación de codigos de
+// huffman, dada la tabla de codigos correspondiente a los datos.
+vector<bool> codificar_datos(istream &e, tabla<char,codigo_h> tabla_codigos);
 
 // Descomprime un vector de booleanos, dado un ahuff con las codificaciones de los caracteres
 void descomprimir_datos(vector<bool> datos, ahuff<char> a, ostream &salida);
