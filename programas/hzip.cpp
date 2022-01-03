@@ -3,6 +3,7 @@
 #include <limits.h>
 #include <sstream>
 #include <stdlib.h>
+#include <string.h>
 #include <vector>
 #include "../tads/tabla.hpp"
 #include "../tads/ahuff.hpp"
@@ -11,64 +12,132 @@ using namespace std;
 
 /* CABECERAS (signaturas) */
 
-// Construir una tabla de frecuencias a partir de los caracteres de un fichero
-tfrecuencias<char> construir_tabla_frecuencias(ifstream &f);
+// FUNCIONES PRINCIPALES
+
+// Comprime un istream y devuelve el resultado en un ostream
+// TODO: Soportar cin para la entrada
+void comprimir(istream &entrada, ostream &salida);
+
+// Descomprime un istream y devuelve el resultado en un ostream
+// TODO: Soportar cin para la entrada
+void descomprimir(istream &entrada, ostream &salida);
+
+// Construir una tabla de frecuencias a partir de un istream
+tfrecuencias<char> construir_tabla_frecuencias(istream &e);
+
+// Reemplaza los caracteres de un istream por una concatenación de codigos de
+// huffman, dada la tabla de codigos correspondiente a los datos.
+vector<bool> codificar_datos(istream &e, tabla<char,codigo_h> tabla_codigos);
+
+// Escribe optimamente una secuencia de bits (de tipo vector<bool>) en un stringstream
+stringstream empaquetar_bits(vector<bool> datos);
+
+// Función inversa de empaquetar_bits
+vector<bool> desempaquetar_bits(istream &e);
+
 // Codifica una tabla de códigos para poder guardarla en un fichero
 stringstream codificar_tabla(tabla<char,codigo_h> tabla_codigos);
-// Reemplaza los caracteres del fichero por una concatenación de codigos de huffman, dada la tabla de caracteres.
-vector<bool> codificar_fichero(tabla<char,codigo_h> tabla_codigos, ifstream &f);
-// Optimiza el espacio que ocupan los datos (un vector de booleanos) para que el fichero resultante ocupe menos espacio
-stringstream optimizar_datos(vector<bool> datos);
-// Comprime un fichero y guarda el resultado en otro fichero con el mismo
-// nombre pero acabado en ".huff"
-void comprimir(string filename);
 
 // Lee y decodifica la tabla de codigos de un fichero comprimido
-tabla<char, codigo_h> leer_tabla_codigos(ifstream &f);
-// Lee los datos comprimidos de un fichero, decodificandolos en un vector de booleanos
-vector<bool> leer_datos(ifstream &f);
+tabla<char, codigo_h> leer_tabla_codigos(istream &es);
+
 // Descomprime un vector de booleanos, dado un ahuff con las codificaciones de los caracteres
 stringstream descomprimir_datos(vector<bool> datos, ahuff<char> a);
-// Descomprime un fichero y guarda el resultado en otro fichero con el mismo
-// nombre pero acabado en ".txt"
-void descomprimir(string filename);
 
 /* IMPLEMENTACIONES */
 
 const char * mensaje_uso = 
             "Uso:\n"
-            "  hzip <modo> <fichero>\n"
+            "  hzip <modo> [<fichero_entrada>] [<fichero_salida>]\n"
             "Parámetros:\n"
             "  modo = \"c\" | \"d\"    comprimir o descomprimir\n"
-            "  fichero             ruta del fichero que se va a procesar\n";
+            "  fichero_entrada     ruta del fichero que se va a procesar\n"
+            "  fichero_salida      ruta del fichero donde se escribirán los resultados\n";
+
+enum modo { modo_comprimir, modo_descomprimir};
 
 int main(int argc, char** argv){
-    if(argc != 3){
-        std::cout << mensaje_uso << endl;
+    (void) argc;
+
+    if(*argv == NULL){
+        cerr << "¡ERROR!" << "\n" << endl;
         return 1;
     }
 
-    string modo = string(argv[1]);
-    string filename = string(argv[2]);
+    string nombre_programa = string(*argv++);
 
-    if(modo == "c") comprimir(filename);
-    else if(modo == "d") descomprimir(filename);
-    else {
-        std::cout <<
+    if(*argv == NULL){
+        cerr << "ERROR: El parámetro modo es obligatorio.\n" << mensaje_uso << endl;
+        return 1;
+    }
+
+    modo modo;
+    if(strcmp(*argv, "c") == 0){
+        modo = modo_comprimir;
+        (void) *argv++;
+    } else if(strcmp(*argv, "d") == 0){
+        modo = modo_descomprimir;
+        (void) *argv++;
+    } else {
+        cerr <<
             "ERROR: ¡modo incorrecto!\n"
             "El modo debe ser \"c\" (comprimir) o \"d\" (descomprimir), pero se ha"
-            "recibido \"" << modo << "\".\n\n" << mensaje_uso << endl;
+            "recibido \"" << *argv << "\".\n\n" << mensaje_uso << endl;
         return 1;
     }
+
+    string nombre_fichero_entrada = "";
+    string nombre_fichero_salida  = "";
+
+    while(*argv != NULL){
+        if(nombre_fichero_entrada == ""){
+            nombre_fichero_entrada = string(*argv++);
+        } else if (nombre_fichero_salida == ""){
+            nombre_fichero_salida = string(*argv++);
+        } else {
+            cerr << "ERROR: Demasiados parámetros recibidos \n" << mensaje_uso << endl;
+            return 1;
+        }
+    }
+
+    ifstream entrada_f;
+    bool entrada_es_f = false;
+    if(nombre_fichero_entrada != ""){
+        entrada_f = ifstream(nombre_fichero_entrada);
+        entrada_es_f = true;
+    }
+
+    ofstream salida_f;
+    bool salida_es_f = false;
+    if(nombre_fichero_salida != ""){
+        salida_f = ofstream(nombre_fichero_salida);
+        salida_es_f = true;
+    }
+
+    if(!entrada_es_f && modo == modo_comprimir){
+        cerr << "ERROR: El modo de compresión no soporta la lectura desde stdin\n";
+        return 1;
+    }
+
+    if(!entrada_es_f && modo == modo_descomprimir){
+        cerr << "ERROR: El modo de descompresión todavía no soporta la lectura desde stdin\n";
+        return 1;
+    }
+
+    if(modo == modo_comprimir)
+        comprimir(entrada_es_f ? entrada_f : cin, salida_es_f ? salida_f : cout);
+    else if(modo == modo_descomprimir)
+        descomprimir(entrada_es_f ? entrada_f : cin, salida_es_f ? salida_f : cout);
+
+    if(entrada_f) entrada_f.close();
+    if(salida_f)  entrada_f.close();
 
     return 0;
 }
 
-void comprimir(string filename){
-    ifstream f = ifstream(filename);
-
+void comprimir(istream &entrada, ostream &salida){
     // Generando tabla de frecuencias
-    tfrecuencias<char> frecs = construir_tabla_frecuencias(f);
+    tfrecuencias<char> frecs = construir_tabla_frecuencias(entrada);
 
     // Generando Árbol de Huffman
     ahuff<char> a = ahuff_desde_frecuencias(frecs);
@@ -84,24 +153,20 @@ void comprimir(string filename){
 
     // Comprimiendo fichero y codificando tabla de códigos
     stringstream codigos_codificados = codificar_tabla(tabla_codigos);
-    vector<bool> datos_bin= codificar_fichero(tabla_codigos, f);
-    stringstream datos_optim = optimizar_datos(datos_bin);
+    vector<bool> datos_bin = codificar_datos(entrada, tabla_codigos);
+    stringstream datos_optim = empaquetar_bits(datos_bin);
 
-    // Guardando fichero comprimido
-    string ofilename = filename + ".huff";
-    ofstream of = ofstream(ofilename);
-    of << codigos_codificados.rdbuf();
-    of << datos_optim.rdbuf();
+    salida << codigos_codificados.rdbuf();
+    salida << datos_optim.rdbuf();
 }
 
-void descomprimir(string filename){
-    ifstream f = ifstream(filename);
+void descomprimir(istream &entrada, ostream &salida){
 
     // Leyendo tabla de códigos
-    tabla<char, codigo_h> tabla_codigos = leer_tabla_codigos(f);
+    tabla<char, codigo_h> tabla_codigos = leer_tabla_codigos(entrada);
 
     // Leyendo datos
-    vector<bool> datos = leer_datos(f);
+    vector<bool> datos = desempaquetar_bits(entrada);
 
     // Construyendo árbol de Huffman a partir de la tabla de códigos
     ahuff<char> a = ahuff_desde_tabla_codigos(tabla_codigos);
@@ -110,17 +175,14 @@ void descomprimir(string filename){
     // Descomprimiendo los datos a partir del árbol de Huffman
     stringstream texto = descomprimir_datos(datos, a);
 
-    // Guardando fichero descomprimido
-    string ofilename = filename + ".txt";
-    ofstream of = ofstream(ofilename);
-    of << texto.rdbuf();
+    salida << texto.rdbuf();
 }
 
-tfrecuencias<char> construir_tabla_frecuencias(ifstream &f){
-    f.clear();
-    f.seekg(0, f.beg);
+tfrecuencias<char> construir_tabla_frecuencias(istream &e){
+    e.clear();
+    e.seekg(0, e.beg);
     tfrecuencias<char> tabla = tfrecuencias_vacia<char>();
-    for (char c; f.get(c);) aniadir(tabla, c, 1);
+    for (char c; e.get(c);) aniadir(tabla, c, 1);
     return tabla;
 }
 
@@ -135,19 +197,19 @@ stringstream codificar_tabla(tabla<char,codigo_h> tabla_codigos){
     return s;
 }
 
-vector<bool> codificar_fichero(tabla<char,codigo_h> tabla_codigos, ifstream &f){
-    f.clear();
-    f.seekg(0, f.beg);
+vector<bool> codificar_datos(istream &e, tabla<char,codigo_h> tabla_codigos){
+    e.clear();
+    e.seekg(0, e.beg);
     vector<bool> datos = vector<bool>();
 
     // TODO: Optimizar
-    for (char c; f.get(c);){
+    for (char c; e.get(c);){
         for(bool b:consultar(tabla_codigos,c)) datos.push_back(b);
     }
     return datos;
 }
 
-stringstream optimizar_datos(vector<bool> datos){
+stringstream empaquetar_bits(vector<bool> datos){
     stringstream s;
     long num_bits = datos.size();
     unsigned char c;
@@ -168,13 +230,13 @@ stringstream optimizar_datos(vector<bool> datos){
     return s;
 }
 
-tabla<char, codigo_h> leer_tabla_codigos(ifstream &f){
+tabla<char, codigo_h> leer_tabla_codigos(istream &es){
     tabla<char, codigo_h> t = tabla_vacia<char,codigo_h>();
     while(true){
         entrada<char, codigo_h> e;
-        f.get(e.clave);
+        es.get(e.clave);
         char c;
-        f.get(c);
+        es.get(c);
         if (e.clave == ';' and c == ';') break;
         else if (c != ':'){
             string error_msg = "Error al descodificar la tabla de codigos: se"
@@ -184,7 +246,7 @@ tabla<char, codigo_h> leer_tabla_codigos(ifstream &f){
                 + string(1, c);
             throw runtime_error(error_msg);
         }
-        while(f.get(c)){
+        while(es.get(c)){
             if(c == ';') break;
             else if( c == '1') e.valor.push_back(true);
             else if( c == '0') e.valor.push_back(false);
@@ -196,28 +258,27 @@ tabla<char, codigo_h> leer_tabla_codigos(ifstream &f){
     return t;
 }
 
-vector<bool> leer_datos(ifstream &f){
+vector<bool> desempaquetar_bits(istream &e){
     long num_bits;
     vector<bool> result;
-    f >> num_bits;
+    e >> num_bits;
     unsigned char c;
     string s;
-    getline(f,s);
+    getline(e,s);
     long pos = 0;
     for(long i =0; i<num_bits/CHAR_BIT; i++){
-         c = f.get();
+         c = e.get();
          for(long j = 0 ; j<CHAR_BIT;j++){
               result.push_back(c % 2);
               c = c/2;
               pos++;
          }
     }
-    c = f.get();
+    c = e.get();
     for(long j = num_bits%CHAR_BIT-1;j>=0;j--){
         result.push_back(c % 2);
         c = c/2;
     }
-    f.close();
     return result;
 }
 
