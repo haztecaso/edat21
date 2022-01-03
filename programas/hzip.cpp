@@ -29,20 +29,20 @@ tfrecuencias<char> construir_tabla_frecuencias(istream &e);
 // huffman, dada la tabla de codigos correspondiente a los datos.
 vector<bool> codificar_datos(istream &e, tabla<char,codigo_h> tabla_codigos);
 
-// Escribe optimamente una secuencia de bits (de tipo vector<bool>) en un stringstream
-stringstream empaquetar_bits(vector<bool> datos);
+// Escribe optimamente una secuencia de bits (de tipo vector<bool>) en un ostream
+void empaquetar_bits(vector<bool> datos, ostream &salida);
 
 // Función inversa de empaquetar_bits
 vector<bool> desempaquetar_bits(istream &e);
 
 // Codifica una tabla de códigos para poder guardarla en un fichero
-stringstream codificar_tabla(tabla<char,codigo_h> tabla_codigos);
+void codificar_tabla(tabla<char,codigo_h> tabla_codigos, ostream &salida);
 
 // Lee y decodifica la tabla de codigos de un fichero comprimido
 tabla<char, codigo_h> leer_tabla_codigos(istream &es);
 
 // Descomprime un vector de booleanos, dado un ahuff con las codificaciones de los caracteres
-stringstream descomprimir_datos(vector<bool> datos, ahuff<char> a);
+void descomprimir_datos(vector<bool> datos, ahuff<char> a, ostream &salida);
 
 /* IMPLEMENTACIONES */
 
@@ -152,12 +152,9 @@ void comprimir(istream &entrada, ostream &salida){
     crear_tabla_codigos(a, tabla_codigos, codigo_vacio());
 
     // Comprimiendo fichero y codificando tabla de códigos
-    stringstream codigos_codificados = codificar_tabla(tabla_codigos);
+    codificar_tabla(tabla_codigos, salida);
     vector<bool> datos_bin = codificar_datos(entrada, tabla_codigos);
-    stringstream datos_optim = empaquetar_bits(datos_bin);
-
-    salida << codigos_codificados.rdbuf();
-    salida << datos_optim.rdbuf();
+    empaquetar_bits(datos_bin, salida);
 }
 
 void descomprimir(istream &entrada, ostream &salida){
@@ -173,9 +170,7 @@ void descomprimir(istream &entrada, ostream &salida){
     ahuff_graphviz("ahuff_descompresion.dot", a);
 
     // Descomprimiendo los datos a partir del árbol de Huffman
-    stringstream texto = descomprimir_datos(datos, a);
-
-    salida << texto.rdbuf();
+    descomprimir_datos(datos, a, salida);
 }
 
 tfrecuencias<char> construir_tabla_frecuencias(istream &e){
@@ -188,13 +183,11 @@ tfrecuencias<char> construir_tabla_frecuencias(istream &e){
 
 using ecod = entrada<char, codigo_h>;
 
-stringstream codificar_tabla(tabla<char,codigo_h> tabla_codigos){
-    stringstream s;
+void codificar_tabla(tabla<char,codigo_h> tabla_codigos, ostream &salida){
     vector<ecod> v = vector<ecod>();
     inorden(tabla_codigos, v);
-    for (ecod e: v) s << e.clave << ":" << e.valor << ";";
-    s << ";;";
-    return s;
+    for (ecod e: v) salida << e.clave << ":" << e.valor << ";";
+    salida << ";;";
 }
 
 vector<bool> codificar_datos(istream &e, tabla<char,codigo_h> tabla_codigos){
@@ -209,25 +202,23 @@ vector<bool> codificar_datos(istream &e, tabla<char,codigo_h> tabla_codigos){
     return datos;
 }
 
-stringstream empaquetar_bits(vector<bool> datos){
-    stringstream s;
+void empaquetar_bits(vector<bool> datos, ostream &salida){
     long num_bits = datos.size();
     unsigned char c;
     long inic;
-    s << num_bits << "\n";
+    salida << num_bits << "\n";
     for(int i = 0; i < num_bits/CHAR_BIT; i++){
         c = 0;
         inic = i*CHAR_BIT;
         for(int j = CHAR_BIT-1; j>=0; j--) c = c*2+datos[inic+j];
-        s<<c;
+        salida<<c;
     }
     c = 0;
     inic = (num_bits/CHAR_BIT)*CHAR_BIT;
     for(int j = num_bits%CHAR_BIT-1;j>=0;j--){
         c = c *2 + datos[inic + j];
     }
-    s << c;
-    return s;
+    salida << c;
 }
 
 tabla<char, codigo_h> leer_tabla_codigos(istream &es){
@@ -282,12 +273,11 @@ vector<bool> desempaquetar_bits(istream &e){
     return result;
 }
 
-stringstream descomprimir_datos(vector<bool> datos, ahuff<char> a){
-    stringstream s;
+void descomprimir_datos(vector<bool> datos, ahuff<char> a, ostream &salida){
     ahuff<char> actual = a;
     for(long unsigned int i = 0; i< datos.size(); i++){
         if(actual->es_hoja()){
-            s << actual->clave;
+            salida << actual->clave;
             actual = a;
             i--;
         }
@@ -295,6 +285,5 @@ stringstream descomprimir_datos(vector<bool> datos, ahuff<char> a){
             actual = datos[i] ? actual->hijo_dr : actual->hijo_iz;
         }
     }
-    return s;
 }
 
