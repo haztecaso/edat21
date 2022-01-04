@@ -10,7 +10,22 @@
 
 using namespace std;
 using ecod = entrada<char, codigo_h>;
+
 const string CABECERA = "FICHERO_COMPRIMIDO_AHUFF";
+
+struct opciones {
+    enum { modo_comprimir, modo_descomprimir } modo;
+    string f_entrada = "";
+    string f_salida = "";
+};
+
+const char * mensaje_uso =
+            "Uso:\n"
+            "  hzip <modo> [<fichero_entrada>] [<fichero_salida>]\n"
+            "Parámetros:\n"
+            "  modo = \"c\" | \"d\"    comprimir o descomprimir\n"
+            "  fichero_entrada     ruta del fichero que se va a procesar\n"
+            "  fichero_salida      ruta del fichero donde se escribirán los resultados\n";
 
 /* CABECERAS (signaturas) */
 
@@ -19,7 +34,6 @@ const string CABECERA = "FICHERO_COMPRIMIDO_AHUFF";
 // Comprime un istream y devuelve el resultado en un ostream
 // TODO: Soportar cin para la entrada
 void comprimir(istream &entrada, ostream &salida);
-
 
 // Descomprime un istream y devuelve el resultado en un ostream
 void descomprimir(istream &entrada, ostream &salida);
@@ -56,26 +70,10 @@ void decodificar_datos(vector<bool> &datos, ahuff<char> a, ahuff<char> &a_actual
 // Comprueba que un istream comienza con la cabecera correcta
 void comprobar_cabecera(istream &e);
 
-/* ARGUMENTOS */
-
-struct opciones {
-    enum { modo_comprimir, modo_descomprimir } modo;
-    string f_entrada = "";
-    string f_salida = "";
-};
-
 // Analizar los argumentos
 opciones analizar_argumentos(char ** argv);
 
 /* IMPLEMENTACIONES */
-
-const char * mensaje_uso =
-            "Uso:\n"
-            "  hzip <modo> [<fichero_entrada>] [<fichero_salida>]\n"
-            "Parámetros:\n"
-            "  modo = \"c\" | \"d\"    comprimir o descomprimir\n"
-            "  fichero_entrada     ruta del fichero que se va a procesar\n"
-            "  fichero_salida      ruta del fichero donde se escribirán los resultados\n";
 
 int main(int argc, char** argv){
     (void) argc;
@@ -235,7 +233,6 @@ tfrecuencias<char> construir_tabla_frecuencias(istream &e){
     for (char c; e.get(c);) aniadir(tabla, c, 1);
     return tabla;
 }
-
 
 void codificar_tabla(tcodigos<char> tabla_codigos, ostream &salida){
     vector<ecod> v = vector<ecod>();
