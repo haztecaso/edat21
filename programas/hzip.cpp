@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <vector>
+#include <cstdint>
 #include "../tads/tabla.hpp"
 #include "../tads/ahuff.hpp"
 
@@ -27,8 +28,9 @@ void empaquetar_bits(vector<bool> datos, ostream &salida);
 // Función inversa de empaquetar_bits
 vector<bool> desempaquetar_bits(istream &e);
 
-// Función inversa de empaquetar_bits
-codigo_h desempaquetar_codigo(istream &e, tcodigos<char> tabla_codigos);
+// Función inversa de empaquetar_bits que desempaqueta una cantidad dada de bits.
+// IMPORTANTE: El parámetro num_bits debe ser menor o igual que CHAR_BIT.
+void desempaquetar_seccion(istream &e, unsigned int num_bits, vector<bool> &datos);
 
 // Construir una tabla de frecuencias a partir de un istream
 tfrecuencias<char> construir_tabla_frecuencias(istream &e);
@@ -44,11 +46,11 @@ tcodigos<char> leer_tabla_codigos(istream &es);
 vector<bool> codificar_datos(istream &e, tcodigos<char> tabla_codigos);
 
 // Descomprime un vector de booleanos, dado un ahuff con las codificaciones de los caracteres
-void descomprimir_datos(vector<bool> datos, ahuff<char> a, ostream &salida);
+void decodificar_datos(vector<bool> &datos, ahuff<char> a, ahuff<char> &a_actual, ostream &salida);
 
 /* IMPLEMENTACIONES */
 
-const char * mensaje_uso = 
+const char * mensaje_uso =
             "Uso:\n"
             "  hzip <modo> [<fichero_entrada>] [<fichero_salida>]\n"
             "Parámetros:\n"
@@ -159,6 +161,8 @@ void comprimir(istream &entrada, ostream &salida){
     empaquetar_bits(datos_bin, salida);
 }
 
+
+
 void descomprimir(istream &entrada, ostream &salida){
 
     // Leyendo tabla de códigos
@@ -168,11 +172,34 @@ void descomprimir(istream &entrada, ostream &salida){
     ahuff<char> a = ahuff_desde_tabla_codigos(tabla_codigos);
     // ahuff_graphviz("ahuff_descompresion.dot", a); // ÚTIL PARA DEBUGUEAR
 
-    // Leyendo datos
-    vector<bool> datos = desempaquetar_bits(entrada);
+    /* vector<bool> datos = desempaquetar_bits(entrada); */
 
-    // Descomprimiendo los datos a partir del árbol de Huffman
-    descomprimir_datos(datos, a, salida);
+    // Leyendo y descomprimiendo datos poco a poco
+    uintmax_t num_bits;
+    entrada >> num_bits;
+
+    uintmax_t pos = 0;
+
+    string s;
+    getline(entrada,s);
+
+    vector<bool> datos = vector<bool>();
+
+    ahuff<char> a_actual = a;
+
+    while(pos < num_bits){
+        unsigned int tamano = num_bits - pos;
+        if (tamano > CHAR_BIT) tamano = CHAR_BIT;
+        // Decodifica los datos hasta donde puede, guardando en la variable
+        // a_actual la posición actual en a, necesaria para seguir decodificando
+        // en la siguiente iteración.
+        decodificar_datos(datos, a, a_actual, salida);
+        // Lectura de una sección de bits
+        desempaquetar_seccion(entrada, tamano, datos);
+        pos += CHAR_BIT;
+    }
+    salida << "\n";
+
 }
 
 tfrecuencias<char> construir_tabla_frecuencias(istream &e){
@@ -205,11 +232,11 @@ vector<bool> codificar_datos(istream &e, tcodigos<char> tabla_codigos){
 }
 
 void empaquetar_bits(vector<bool> datos, ostream &salida){
-    long num_bits = datos.size();
+    uintmax_t num_bits = datos.size();
     unsigned char c;
     long inic;
     salida << num_bits << "\n";
-    for(int i = 0; i < num_bits/CHAR_BIT; i++){
+    for(uintmax_t i = 0; i < num_bits/CHAR_BIT; i++){
         c = 0;
         inic = i*CHAR_BIT;
         for(int j = CHAR_BIT-1; j>=0; j--) c = c*2+datos[inic+j];
@@ -252,19 +279,17 @@ tcodigos<char> leer_tabla_codigos(istream &es){
 }
 
 vector<bool> desempaquetar_bits(istream &e){
-    long num_bits;
+    uintmax_t num_bits;
     vector<bool> result;
     e >> num_bits;
     unsigned char c;
     string s;
     getline(e,s);
-    long pos = 0;
-    for(long i =0; i<num_bits/CHAR_BIT; i++){
+    for(uintmax_t i = 0; i<num_bits/CHAR_BIT; i++){
          c = e.get();
          for(long j = 0 ; j<CHAR_BIT;j++){
               result.push_back(c % 2);
               c = c/2;
-              pos++;
          }
     }
     c = e.get();
@@ -275,16 +300,23 @@ vector<bool> desempaquetar_bits(istream &e){
     return result;
 }
 
-void descomprimir_datos(vector<bool> datos, ahuff<char> a, ostream &salida){
-    ahuff<char> actual = a;
-    for(long unsigned int i = 0; i< datos.size(); i++){
-        if(actual->es_hoja()){
-            salida << actual->clave;
-            actual = a;
-            i--;
-        }
-        else{
-            actual = datos[i] ? actual->hijo_dr : actual->hijo_iz;
+void desempaquetar_seccion(istream &e, unsigned int num_bits, vector<bool> &datos){
+    unsigned char c = e.get();
+    for(unsigned int i = 0; i<num_bits; i++){
+        datos.push_back(c % 2);
+        c = c / 2;
+    }
+}
+
+void decodificar_datos(vector<bool> &datos, ahuff<char> a, ahuff<char> &a_actual, ostream &salida){
+    while(datos.size() > 0){
+        bool b = datos[0];
+        if(a_actual->es_hoja()){
+            salida << a_actual -> clave;
+            a_actual = a;
+        } else {
+            a_actual = b ? a_actual->hijo_dr : a_actual->hijo_iz;
+            datos.erase(datos.begin()); // TODO: ¿mejor utilizar deque para tener pop_start?
         }
     }
 }
