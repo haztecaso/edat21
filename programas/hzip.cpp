@@ -10,6 +10,8 @@
 
 using namespace std;
 
+using ecod = entrada<char, codigo_h>;
+
 /* CABECERAS (signaturas) */
 
 // FUNCIONES PRINCIPALES
@@ -47,6 +49,7 @@ vector<bool> codificar_datos(istream &e, tcodigos<char> tabla_codigos);
 
 // Descomprime un vector de booleanos, dado un ahuff con las codificaciones de los caracteres
 void decodificar_datos(vector<bool> &datos, ahuff<char> a, ahuff<char> &a_actual, ostream &salida);
+
 
 /* IMPLEMENTACIONES */
 
@@ -202,35 +205,6 @@ void descomprimir(istream &entrada, ostream &salida){
 
 }
 
-tfrecuencias<char> construir_tabla_frecuencias(istream &e){
-    e.clear();
-    e.seekg(0, e.beg);
-    tfrecuencias<char> tabla = tfrecuencias_vacia<char>();
-    for (char c; e.get(c);) aniadir(tabla, c, 1);
-    return tabla;
-}
-
-using ecod = entrada<char, codigo_h>;
-
-void codificar_tabla(tcodigos<char> tabla_codigos, ostream &salida){
-    vector<ecod> v = vector<ecod>();
-    inorden(tabla_codigos, v);
-    for (ecod e: v) salida << e.clave << ":" << e.valor << ";";
-    salida << ";;";
-}
-
-vector<bool> codificar_datos(istream &e, tcodigos<char> tabla_codigos){
-    e.clear();
-    e.seekg(0, e.beg);
-    vector<bool> datos = vector<bool>();
-
-    // TODO: Optimizar
-    for (char c; e.get(c);){
-        for(bool b:consultar(tabla_codigos,c)) datos.push_back(b);
-    }
-    return datos;
-}
-
 void empaquetar_bits(vector<bool> datos, ostream &salida){
     uintmax_t num_bits = datos.size();
     unsigned char c;
@@ -248,34 +222,6 @@ void empaquetar_bits(vector<bool> datos, ostream &salida){
         c = c *2 + datos[inic + j];
     }
     salida << c;
-}
-
-tcodigos<char> leer_tabla_codigos(istream &es){
-    tcodigos<char> t = tcodigos_vacia<char>();
-    while(true){
-        entrada<char, codigo_h> e;
-        es.get(e.clave);
-        char c;
-        es.get(c);
-        if (e.clave == ';' and c == ';') break;
-        else if (c != ':'){
-            string error_msg = "Error al descodificar la tabla de codigos: se"
-                "esperaba el caracter ':' como separador o la secuencia \";;\""
-                "como indicador del final de la tabla de códigos\n"
-                "Obtenido: clave = " + string(1, e.clave) + ", separador = "
-                + string(1, c);
-            throw runtime_error(error_msg);
-        }
-        while(es.get(c)){
-            if(c == ';') break;
-            else if( c == '1') e.valor.push_back(true);
-            else if( c == '0') e.valor.push_back(false);
-            else throw runtime_error("Error al descodificar la tabla de codigos"
-                    ": se esperaba un '0','1' o ';'");
-        }
-        aniadir(t, e);
-    }
-    return t;
 }
 
 vector<bool> desempaquetar_bits(istream &e){
@@ -306,6 +252,62 @@ void desempaquetar_seccion(istream &e, unsigned int num_bits, vector<bool> &dato
         datos.push_back(c % 2);
         c = c / 2;
     }
+}
+
+tfrecuencias<char> construir_tabla_frecuencias(istream &e){
+    e.clear();
+    e.seekg(0, e.beg);
+    tfrecuencias<char> tabla = tfrecuencias_vacia<char>();
+    for (char c; e.get(c);) aniadir(tabla, c, 1);
+    return tabla;
+}
+
+
+void codificar_tabla(tcodigos<char> tabla_codigos, ostream &salida){
+    vector<ecod> v = vector<ecod>();
+    inorden(tabla_codigos, v);
+    for (ecod e: v) salida << e.clave << ":" << e.valor << ";";
+    salida << ";;";
+}
+
+tcodigos<char> leer_tabla_codigos(istream &es){
+    tcodigos<char> t = tcodigos_vacia<char>();
+    while(true){
+        ecod e;
+        es.get(e.clave);
+        char c;
+        es.get(c);
+        if (e.clave == ';' and c == ';') break;
+        else if (c != ':'){
+            string error_msg = "Error al descodificar la tabla de codigos: se"
+                "esperaba el caracter ':' como separador o la secuencia \";;\""
+                "como indicador del final de la tabla de códigos\n"
+                "Obtenido: clave = " + string(1, e.clave) + ", separador = "
+                + string(1, c);
+            throw runtime_error(error_msg);
+        }
+        while(es.get(c)){
+            if(c == ';') break;
+            else if( c == '1') e.valor.push_back(true);
+            else if( c == '0') e.valor.push_back(false);
+            else throw runtime_error("Error al descodificar la tabla de codigos"
+                    ": se esperaba un '0','1' o ';'");
+        }
+        aniadir(t, e);
+    }
+    return t;
+}
+
+vector<bool> codificar_datos(istream &e, tcodigos<char> tabla_codigos){
+    e.clear();
+    e.seekg(0, e.beg);
+    vector<bool> datos = vector<bool>();
+
+    // TODO: Optimizar
+    for (char c; e.get(c);){
+        for(bool b:consultar(tabla_codigos,c)) datos.push_back(b);
+    }
+    return datos;
 }
 
 void decodificar_datos(vector<bool> &datos, ahuff<char> a, ahuff<char> &a_actual, ostream &salida){
