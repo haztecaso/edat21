@@ -14,12 +14,6 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    - name: cache binaries
-      id: cache-bins
-      uses: actions/cache@v2
-      with:
-        path: bin
-        key: ${{ runner.os }}-bins
     - name: build
       run: make build
     - name: test

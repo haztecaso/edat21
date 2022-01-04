@@ -153,7 +153,6 @@ void descomprimir(istream &entrada, ostream &salida){
     // Construyendo árbol de Huffman a partir de la tabla de códigos
     ahuff<char> a = ahuff_desde_tabla_codigos(tabla_codigos);
     // ahuff_graphviz("ahuff_descompresion.dot", a); // ÚTIL PARA DEBUGUEAR
-    
 
     // Leyendo y descomprimiendo datos poco a poco
     uintmax_t num_bits;
