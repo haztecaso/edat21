@@ -47,7 +47,10 @@ tcodigos<char> leer_tabla_codigos(istream &es);
 // huffman, dada la tabla de codigos correspondiente a los datos.
 vector<bool> codificar_datos(istream &e, tcodigos<char> tabla_codigos);
 
-// Descomprime un vector de booleanos, dado un ahuff con las codificaciones de los caracteres
+// Decodifica unos datos (vector de booleanos), dado un ahuff y una posición en
+// el ahuff (a_actual). Además modifica a_actual para guardar la posición actual
+// en el árbol, de modo que se pueda continuar la decodifiación en la siguiente
+// llamada a la función.
 void decodificar_datos(vector<bool> &datos, ahuff<char> a, ahuff<char> &a_actual, ostream &salida);
 
 
@@ -167,15 +170,12 @@ void comprimir(istream &entrada, ostream &salida){
 
 
 void descomprimir(istream &entrada, ostream &salida){
-
     // Leyendo tabla de códigos
     tcodigos<char> tabla_codigos = leer_tabla_codigos(entrada);
 
     // Construyendo árbol de Huffman a partir de la tabla de códigos
     ahuff<char> a = ahuff_desde_tabla_codigos(tabla_codigos);
     // ahuff_graphviz("ahuff_descompresion.dot", a); // ÚTIL PARA DEBUGUEAR
-
-    /* vector<bool> datos = desempaquetar_bits(entrada); */
 
     // Leyendo y descomprimiendo datos poco a poco
     uintmax_t num_bits;
@@ -193,16 +193,10 @@ void descomprimir(istream &entrada, ostream &salida){
     while(pos < num_bits){
         unsigned int tamano = num_bits - pos;
         if (tamano > CHAR_BIT) tamano = CHAR_BIT;
-        // Decodifica los datos hasta donde puede, guardando en la variable
-        // a_actual la posición actual en a, necesaria para seguir decodificando
-        // en la siguiente iteración.
         decodificar_datos(datos, a, a_actual, salida);
-        // Lectura de una sección de bits
         desempaquetar_seccion(entrada, tamano, datos);
         pos += CHAR_BIT;
     }
-    salida << "\n";
-
 }
 
 void empaquetar_bits(vector<bool> datos, ostream &salida){
