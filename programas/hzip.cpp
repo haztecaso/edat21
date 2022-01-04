@@ -21,7 +21,6 @@ using ecod = entrada<char, codigo_h>;
 void comprimir(istream &entrada, ostream &salida);
 
 // Descomprime un istream y devuelve el resultado en un ostream
-// TODO: Soportar cin para la entrada
 void descomprimir(istream &entrada, ostream &salida);
 
 // Escribe optimamente una secuencia de bits (de tipo vector<bool>) en un ostream
@@ -126,11 +125,6 @@ int main(int argc, char** argv){
 
     if(!entrada_es_f && modo == modo_comprimir){
         cerr << "ERROR: El modo de compresión no soporta la lectura desde stdin\n";
-        return 1;
-    }
-
-    if(!entrada_es_f && modo == modo_descomprimir){
-        cerr << "ERROR: El modo de descompresión todavía no soporta la lectura desde stdin\n";
         return 1;
     }
 
