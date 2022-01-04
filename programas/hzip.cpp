@@ -175,6 +175,7 @@ void descomprimir(istream &entrada, ostream &salida){
         desempaquetar_seccion(entrada, tamano, datos);
         pos += CHAR_BIT;
     }
+    salida << "\n";
 }
 
 void empaquetar_bits(vector<bool> datos, ostream &salida){
@@ -274,9 +275,9 @@ vector<bool> codificar_datos(istream &e, tcodigos<char> tabla_codigos){
     e.seekg(0, e.beg);
     vector<bool> datos = vector<bool>();
 
-    // TODO: Optimizar
     for (char c; e.get(c);){
-        for(bool b:consultar(tabla_codigos,c)) datos.push_back(b);
+        codigo_h cod = consultar(tabla_codigos, c);
+        datos.insert(datos.end(), cod.begin(), cod.end());
     }
     return datos;
 }
