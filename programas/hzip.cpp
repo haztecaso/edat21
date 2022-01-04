@@ -9,8 +9,8 @@
 #include "../tads/ahuff.hpp"
 
 using namespace std;
-
 using ecod = entrada<char, codigo_h>;
+const string CABECERA = "FICHERO_COMPRIMIDO_AHUFF";
 
 /* CABECERAS (signaturas) */
 
@@ -19,6 +19,7 @@ using ecod = entrada<char, codigo_h>;
 // Comprime un istream y devuelve el resultado en un ostream
 // TODO: Soportar cin para la entrada
 void comprimir(istream &entrada, ostream &salida);
+
 
 // Descomprime un istream y devuelve el resultado en un ostream
 void descomprimir(istream &entrada, ostream &salida);
@@ -52,6 +53,19 @@ vector<bool> codificar_datos(istream &e, tcodigos<char> tabla_codigos);
 // llamada a la función.
 void decodificar_datos(vector<bool> &datos, ahuff<char> a, ahuff<char> &a_actual, ostream &salida);
 
+// Comprueba que un istream comienza con la cabecera correcta
+void comprobar_cabecera(istream &e);
+
+/* ARGUMENTOS */
+
+struct opciones {
+    enum { modo_comprimir, modo_descomprimir } modo;
+    string f_entrada = "";
+    string f_salida = "";
+};
+
+// Analizar los argumentos
+opciones analizar_argumentos(char ** argv);
 
 /* IMPLEMENTACIONES */
 
@@ -63,80 +77,47 @@ const char * mensaje_uso =
             "  fichero_entrada     ruta del fichero que se va a procesar\n"
             "  fichero_salida      ruta del fichero donde se escribirán los resultados\n";
 
-enum modo { modo_comprimir, modo_descomprimir};
-
 int main(int argc, char** argv){
     (void) argc;
 
-    if(*argv == NULL){
-        cerr << "¡ERROR!" << "\n" << endl;
+    int error_n = 0;
+
+    opciones opc;
+    try{
+        opc = analizar_argumentos(argv);
+    } catch(const runtime_error& error) {
+        cerr << "ERROR: " << error.what() << endl;
+        cerr << mensaje_uso;
         return 1;
-    }
-
-    string nombre_programa = string(*argv++);
-
-    if(*argv == NULL){
-        cerr << "ERROR: El parámetro modo es obligatorio.\n" << mensaje_uso << endl;
-        return 1;
-    }
-
-    modo modo;
-    if(strcmp(*argv, "c") == 0){
-        modo = modo_comprimir;
-        (void) *argv++;
-    } else if(strcmp(*argv, "d") == 0){
-        modo = modo_descomprimir;
-        (void) *argv++;
-    } else {
-        cerr <<
-            "ERROR: ¡modo incorrecto!\n"
-            "El modo debe ser \"c\" (comprimir) o \"d\" (descomprimir), pero se ha"
-            "recibido \"" << *argv << "\".\n\n" << mensaje_uso << endl;
-        return 1;
-    }
-
-    string nombre_fichero_entrada = "";
-    string nombre_fichero_salida  = "";
-
-    while(*argv != NULL){
-        if(nombre_fichero_entrada == ""){
-            nombre_fichero_entrada = string(*argv++);
-        } else if (nombre_fichero_salida == ""){
-            nombre_fichero_salida = string(*argv++);
-        } else {
-            cerr << "ERROR: Demasiados parámetros recibidos \n" << mensaje_uso << endl;
-            return 1;
-        }
     }
 
     ifstream entrada_f;
     bool entrada_es_f = false;
-    if(nombre_fichero_entrada != ""){
-        entrada_f = ifstream(nombre_fichero_entrada);
+    if(opc.f_entrada!= ""){
+        entrada_f = ifstream(opc.f_entrada);
         entrada_es_f = true;
     }
 
     ofstream salida_f;
     bool salida_es_f = false;
-    if(nombre_fichero_salida != ""){
-        salida_f = ofstream(nombre_fichero_salida);
+    if(opc.f_salida != ""){
+        salida_f = ofstream(opc.f_salida);
         salida_es_f = true;
     }
 
-    if(!entrada_es_f && modo == modo_comprimir){
-        cerr << "ERROR: El modo de compresión no soporta la lectura desde stdin\n";
-        return 1;
+    try{
+        if(opc.modo == opciones::modo_comprimir)
+            comprimir(entrada_es_f ? entrada_f : cin, salida_es_f ? salida_f : cout);
+        else if(opc.modo == opciones::modo_descomprimir)
+            descomprimir(entrada_es_f ? entrada_f : cin, salida_es_f ? salida_f : cout);
+    } catch(const runtime_error& error) {
+        error_n = 1;
+        cerr << "ERROR: " << error.what() << endl;
     }
+    if(entrada_es_f) entrada_f.close();
+    if(salida_es_f)  entrada_f.close();
 
-    if(modo == modo_comprimir)
-        comprimir(entrada_es_f ? entrada_f : cin, salida_es_f ? salida_f : cout);
-    else if(modo == modo_descomprimir)
-        descomprimir(entrada_es_f ? entrada_f : cin, salida_es_f ? salida_f : cout);
-
-    if(entrada_f) entrada_f.close();
-    if(salida_f)  entrada_f.close();
-
-    return 0;
+    return error_n;
 }
 
 void comprimir(istream &entrada, ostream &salida){
@@ -155,21 +136,26 @@ void comprimir(istream &entrada, ostream &salida){
     tcodigos<char> tabla_codigos = tcodigos_vacia<char>();
     crear_tabla_codigos(a, tabla_codigos, codigo_vacio());
 
+    // Escribiendo cabecera
+    salida << CABECERA;
+
     // Comprimiendo fichero y codificando tabla de códigos
     codificar_tabla(tabla_codigos, salida);
     vector<bool> datos_bin = codificar_datos(entrada, tabla_codigos);
     empaquetar_bits(datos_bin, salida);
 }
 
-
-
 void descomprimir(istream &entrada, ostream &salida){
+    // Comprobando cabecara
+    comprobar_cabecera(entrada);
+
     // Leyendo tabla de códigos
     tcodigos<char> tabla_codigos = leer_tabla_codigos(entrada);
 
     // Construyendo árbol de Huffman a partir de la tabla de códigos
     ahuff<char> a = ahuff_desde_tabla_codigos(tabla_codigos);
     // ahuff_graphviz("ahuff_descompresion.dot", a); // ÚTIL PARA DEBUGUEAR
+    
 
     // Leyendo y descomprimiendo datos poco a poco
     uintmax_t num_bits;
@@ -267,7 +253,7 @@ tcodigos<char> leer_tabla_codigos(istream &es){
         es.get(c);
         if (e.clave == ';' and c == ';') break;
         else if (c != ':'){
-            string error_msg = "Error al descodificar la tabla de codigos: se"
+            string error_msg = "Al descodificar la tabla de codigos: se"
                 "esperaba el caracter ':' como separador o la secuencia \";;\""
                 "como indicador del final de la tabla de códigos\n"
                 "Obtenido: clave = " + string(1, e.clave) + ", separador = "
@@ -278,8 +264,8 @@ tcodigos<char> leer_tabla_codigos(istream &es){
             if(c == ';') break;
             else if( c == '1') e.valor.push_back(true);
             else if( c == '0') e.valor.push_back(false);
-            else throw runtime_error("Error al descodificar la tabla de codigos"
-                    ": se esperaba un '0','1' o ';'");
+            else throw runtime_error("Al descodificar la tabla de codigos: se"
+                    "esperaba un '0','1' o ';'");
         }
         aniadir(t, e);
     }
@@ -311,3 +297,46 @@ void decodificar_datos(vector<bool> &datos, ahuff<char> a, ahuff<char> &a_actual
     }
 }
 
+void comprobar_cabecera(istream &e){
+        char c;
+        for(char s:CABECERA){
+            e >> c;
+            if(c != s) throw runtime_error("Cabecera incorrecta");
+        }
+}
+
+opciones analizar_argumentos(char ** argv){
+    opciones opc;
+
+    if(*argv == NULL) throw runtime_error("argv vacío");
+
+    (void) *argv++;
+
+    if(*argv == NULL) throw runtime_error("El parámetro modo es obligatorio.");
+
+    if(strcmp(*argv, "c") == 0){
+        opc.modo = opciones::modo_comprimir;
+        (void) *argv++;
+    } else if(strcmp(*argv, "d") == 0){
+        opc.modo = opciones::modo_descomprimir;
+        (void) *argv++;
+    } else {
+        throw runtime_error("¡Modo incorrecto! El modo debe ser \"c\" (comprimir) o \"d\" (descomprimir)");
+    }
+
+    while(*argv != NULL){
+        if(opc.f_entrada== ""){
+            opc.f_entrada = string(*argv++);
+        } else if (opc.f_salida== ""){
+            opc.f_salida = string(*argv++);
+        } else {
+            throw runtime_error("Demasiados parámetros recibidos");
+        }
+    }
+
+    if(opc.f_entrada == ""&& opc.modo == opciones::modo_comprimir){
+        throw runtime_error("El modo de compresión no soporta la lectura desde stdin");
+    }
+
+    return opc;
+}
