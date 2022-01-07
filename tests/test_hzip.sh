@@ -2,10 +2,14 @@
 # Este archivo debe ser ejecutado desde el root del repositorio
 
 hzip="./bin/hzip"
+testfiles=( ./textos/simple.txt ./textos/quijote.txt ./textos/commedia.txt )
 
-set -xe
 make $hzip
-$hzip c $1 $1.huff
-$hzip d $1.huff $1.huff.txt
-diff -s $1 $1.huff.txt
-rm $1.huff $1.huff.txt
+
+echo "Testing hzip: compression -> decompression -> diff"
+for testfile in "${testfiles[@]}"; do
+    $hzip c $testfile $testfile.huff
+    $hzip d $testfile.huff $testfile.huff.txt
+    diff -s $testfile $testfile.huff.txt
+    rm $testfile.huff $testfile.huff.txt
+done
