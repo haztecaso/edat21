@@ -1,10 +1,12 @@
+#include <cstdint>
 #include <fstream>
 #include <iostream>
 #include <limits.h>
+#include <queue>
 #include <stdlib.h>
 #include <string.h>
 #include <vector>
-#include <cstdint>
+
 #include "../tads/tabla.hpp"
 #include "../tads/ahuff.hpp"
 
@@ -33,6 +35,9 @@ const char * mensaje_uso =
 
 // Comprime un istream y devuelve el resultado en un ostream
 // TODO: Soportar cin para la entrada
+// (Esto tiene su complicación ya que para comprimir los datos hay que hacer dos
+// pases: uno para generar la tabla de frecuencias y otro para codificar los
+// datos)
 void comprimir(istream &entrada, ostream &salida);
 
 // Descomprime un istream y devuelve el resultado en un ostream
@@ -46,7 +51,7 @@ vector<bool> desempaquetar_bits(istream &e);
 
 // Función inversa de empaquetar_bits que desempaqueta una cantidad dada de bits.
 // IMPORTANTE: El parámetro num_bits debe ser menor o igual que CHAR_BIT.
-void desempaquetar_seccion(istream &e, unsigned int num_bits, vector<bool> &datos);
+void desempaquetar_seccion(istream &e, unsigned int num_bits, queue<bool> &datos);
 
 // Construir una tabla de frecuencias a partir de un istream
 tfrecuencias<char> construir_tabla_frecuencias(istream &e);
@@ -65,7 +70,7 @@ vector<bool> codificar_datos(istream &e, tcodigos<char> tabla_codigos);
 // el ahuff (a_actual). Además modifica a_actual para guardar la posición actual
 // en el árbol, de modo que se pueda continuar la decodifiación en la siguiente
 // llamada a la función.
-void decodificar_datos(vector<bool> &datos, ahuff<char> a, ahuff<char> &a_actual, ostream &salida);
+void decodificar_datos(queue<bool> &datos, ahuff<char> a, ahuff<char> &a_actual, ostream &salida);
 
 // Comprueba que un istream comienza con la cabecera correcta
 void comprobar_cabecera(istream &e);
@@ -163,7 +168,7 @@ void descomprimir(istream &entrada, ostream &salida){
     string s;
     getline(entrada,s);
 
-    vector<bool> datos = vector<bool>();
+    queue<bool> datos = queue<bool>();
 
     ahuff<char> a_actual = a;
 
@@ -218,10 +223,10 @@ vector<bool> desempaquetar_bits(istream &e){
     return result;
 }
 
-void desempaquetar_seccion(istream &e, unsigned int num_bits, vector<bool> &datos){
+void desempaquetar_seccion(istream &e, unsigned int num_bits, queue<bool> &datos){
     unsigned char c = e.get();
     for(unsigned int i = 0; i<num_bits; i++){
-        datos.push_back(c % 2);
+        datos.push(c % 2);
         c = c / 2;
     }
 }
@@ -281,15 +286,15 @@ vector<bool> codificar_datos(istream &e, tcodigos<char> tabla_codigos){
     return datos;
 }
 
-void decodificar_datos(vector<bool> &datos, ahuff<char> a, ahuff<char> &a_actual, ostream &salida){
+void decodificar_datos(queue<bool> &datos, ahuff<char> a, ahuff<char> &a_actual, ostream &salida){
     while(datos.size() > 0){
-        bool b = datos[0];
+        bool b = datos.front();
         if(a_actual->es_hoja()){
             salida << a_actual -> clave;
             a_actual = a;
         } else {
             a_actual = b ? a_actual->hijo_dr : a_actual->hijo_iz;
-            datos.erase(datos.begin()); // TODO: ¿mejor utilizar deque para tener pop_start?
+            datos.pop();
         }
     }
 }
