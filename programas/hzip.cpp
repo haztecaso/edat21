@@ -97,15 +97,27 @@ int main(int argc, char** argv){
     ifstream entrada_f;
     bool entrada_es_f = false;
     if(opc.f_entrada!= ""){
-        entrada_f = ifstream(opc.f_entrada);
-        entrada_es_f = true;
+        entrada_f.exceptions(ifstream::failbit | ifstream::badbit);
+        try{
+            entrada_f.open(opc.f_entrada);
+            entrada_es_f = true;
+        } catch(const ifstream::failure& e){
+            cerr << "ERROR: No se ha podido abrir el fichero " << opc.f_entrada << endl;
+            return 1;
+        }
     }
 
     ofstream salida_f;
     bool salida_es_f = false;
     if(opc.f_salida != ""){
-        salida_f = ofstream(opc.f_salida);
-        salida_es_f = true;
+        salida_f.exceptions(ifstream::failbit | ifstream::badbit);
+        try{
+            salida_f.open(opc.f_salida);
+            salida_es_f = true;
+        } catch(const ifstream::failure& e){
+            cerr << "ERROR: No se ha podido abrir el fichero " << opc.f_entrada << endl;
+            return 1;
+        }
     }
 
     try{
